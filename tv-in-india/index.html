@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="UX research case study: how mixed-methods research shaped a smart-TV UI in India.">
+<style>body{margin:0}</style>
+<title>TV in India</title>
+<style>
+/* Layout: Apple-style long read. Light grey canvas with large white tiles (no borders), translucent sticky nav, system type with size-specific tracking, spacing in rem so it scales with the reader's text size. The interactive 2x2 is the centerpiece. */
+:root{
+  --bg:#F5F5F7; --surface:#FFFFFF; --ink:#1D1D1F; --ink-2:#424245; --muted:#6E6E73; --line:rgb(0 0 0 / 8%);
+  --indigo:#0071E3; --indigo-soft:rgb(0 113 227 / 10%); --marigold:#C76A00; --marigold-soft:rgb(255 149 0 / 14%); --marigold-ink:#A35200;
+  --bar:#D2D2D7; --shade:#F5F5F7;
+  --va-soft:rgb(90 200 250 / 18%); --va-ink:#0A6EA8; --mt-soft:rgb(52 199 89 / 12%); --mt-ink:#248A3D;
+  --material:rgb(255 255 255 / 72%); --material-edge:rgb(255 255 255 / 60%);
+  --tip-bg:rgb(255 255 255 / 82%);
+  --shadow-sm:0 1px 2px rgb(0 0 0 / 4%), 0 4px 12px rgb(0 0 0 / 4%);
+  --shadow-lg:0 2px 6px rgb(0 0 0 / 6%), 0 18px 48px rgb(0 0 0 / 14%);
+  --sys:system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", Roboto, sans-serif;
+  --spring:cubic-bezier(.2,.9,.25,1);
+  font: 100%/1.5 var(--sys);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --va-soft:rgb(100 210 255 / 16%); --va-ink:#64D2FF; --mt-soft:rgb(48 209 88 / 14%); --mt-ink:#30DB5B;
+  --bg:#000000; --surface:#1C1C1E; --ink:#F5F5F7; --ink-2:#D1D1D6; --muted:#98989D; --line:rgb(255 255 255 / 10%);
+  --indigo:#0A84FF; --indigo-soft:rgb(10 132 255 / 18%); --marigold:#C97800; --marigold-soft:rgb(255 159 10 / 18%); --marigold-ink:#FFB340;
+  --bar:#3A3A3C; --shade:#2C2C2E;
+  --material:rgb(22 22 23 / 72%); --material-edge:rgb(255 255 255 / 8%);
+  --tip-bg:rgb(44 44 46 / 82%);
+  --shadow-sm:none; --shadow-lg:0 0 0 1px rgb(255 255 255 / 8%), 0 18px 48px rgb(0 0 0 / 60%); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --va-soft:rgb(100 210 255 / 16%); --va-ink:#64D2FF; --mt-soft:rgb(48 209 88 / 14%); --mt-ink:#30DB5B;
+  --bg:#000000; --surface:#1C1C1E; --ink:#F5F5F7; --ink-2:#D1D1D6; --muted:#98989D; --line:rgb(255 255 255 / 10%);
+  --indigo:#0A84FF; --indigo-soft:rgb(10 132 255 / 18%); --marigold:#C97800; --marigold-soft:rgb(255 159 10 / 18%); --marigold-ink:#FFB340;
+  --bar:#3A3A3C; --shade:#2C2C2E;
+  --material:rgb(22 22 23 / 72%); --material-edge:rgb(255 255 255 / 8%);
+  --tip-bg:rgb(44 44 46 / 82%);
+  --shadow-sm:none; --shadow-lg:0 0 0 1px rgb(255 255 255 / 8%), 0 18px 48px rgb(0 0 0 / 60%); color-scheme:dark;}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--sys);font-size:1.0625rem;line-height:1.53;letter-spacing:-0.011em;-webkit-font-smoothing:antialiased;font-optical-sizing:auto}
+.wrap{max-width:68.75rem;margin:0 auto;padding-left:max(1.25rem, env(safe-area-inset-left, 0px));padding-right:max(1.25rem, env(safe-area-inset-right, 0px))}
+h1,h2,h3,h4{font-family:var(--sys);text-wrap:balance;margin:0;font-optical-sizing:auto}
+p{margin:0}
+a{color:var(--indigo)}
+a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:3px solid color-mix(in srgb,var(--indigo) 55%,transparent);outline-offset:2px;border-radius:8px}
+.eyebrow{font-size:.9375rem;font-weight:600;letter-spacing:-0.005em;color:var(--marigold-ink)}
+.prose{max-width:40rem;display:grid;gap:1rem;color:var(--ink-2);font-size:1.1875rem;line-height:1.47;letter-spacing:-0.014em}
+.prose strong{color:var(--ink);font-weight:600}
+.tag{display:inline-block;font-size:.75rem;font-weight:600;letter-spacing:.005em;padding:.2rem .6rem;border-radius:999px;background:var(--shade);color:var(--muted);white-space:nowrap}
+.tag.qual{color:var(--indigo);background:var(--indigo-soft)}
+.tag.quant{color:var(--marigold-ink);background:var(--marigold-soft)}
+img{max-width:100%;height:auto;display:block}
+figure{margin:0}
+figcaption{font-size:.875rem;line-height:1.43;letter-spacing:-0.006em;color:var(--muted);margin-top:.75rem}
+figcaption b{color:var(--ink);font-weight:600}
+
+/* translucent nav: content scrolls under it; edge appears only once something is underneath */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--material);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%)}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--material);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);transition:box-shadow .3s ease}
+.nav.scrolled{box-shadow:0 1px 0 var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:1.75rem;height:3.25rem;overflow-x:auto;scrollbar-width:none}
+.nav .wrap::-webkit-scrollbar{display:none}
+.nav b{font-weight:600;font-size:1.3125rem;letter-spacing:.011em;white-space:nowrap;margin-right:auto}
+.nav a{font-size:.8125rem;letter-spacing:-0.01em;color:var(--ink-2);text-decoration:none;white-space:nowrap;transition:color .2s ease}
+.nav a:hover{color:var(--indigo)}
+
+/* hero */
+.hero{padding-block:4.5rem 3rem}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:3.5rem;align-items:center}
+.hero h1{font-size:clamp(3.25rem,7vw,5.25rem);font-weight:700;letter-spacing:-0.035em;line-height:1.03;margin-top:.75rem;white-space:nowrap}
+.hero .lede{font-size:clamp(1.3125rem,2vw,1.5rem);line-height:1.33;letter-spacing:-0.019em;font-weight:500;color:var(--ink-2);margin-top:1.25rem;max-width:26ch}
+.byline{margin-top:1.75rem;font-size:.9375rem;color:var(--muted);display:grid;gap:.15rem}
+.byline b{color:var(--ink);font-weight:600}
+.hero figure img{border-radius:1.5rem;aspect-ratio:3/2;object-fit:cover;width:100%;background:var(--shade)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin-top:3.5rem}
+.fact{background:var(--surface);border-radius:1.25rem;padding:1.5rem;display:grid;gap:.35rem;align-content:start}
+.fact .n{font-size:2.75rem;font-weight:700;letter-spacing:-0.03em;line-height:1.05;font-variant-numeric:tabular-nums}
+.fact .l{font-size:.9375rem;line-height:1.4;color:var(--muted)}
+
+/* chapters */
+section.chapter{padding-block:6.5rem}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr);gap:.75rem;margin-bottom:3rem;max-width:52rem}
+.sec-head .num{font-size:1.0625rem;font-weight:600;color:var(--marigold-ink);letter-spacing:-0.01em}
+.sec-head h2{font-size:clamp(2.5rem,5vw,3.5rem);font-weight:700;letter-spacing:-0.03em;line-height:1.07}
+.sec-head .prose{margin-top:1.25rem}
+.indent{margin-left:0}
+
+/* background */
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem}
+.panel{background:var(--surface);border-radius:1.5rem;padding:1.75rem;display:grid;gap:.85rem;align-content:start;min-width:0}
+.panel h3{font-size:1.5rem;font-weight:600;letter-spacing:-0.02em;line-height:1.17}
+.panel p{color:var(--ink-2);font-size:1.0625rem}
+.list{display:grid;gap:.5rem;padding:0;margin:0;list-style:none}
+.list li{padding-left:1.25rem;position:relative;color:var(--ink-2)}
+.list li::before{content:"";position:absolute;left:.15rem;top:.62em;width:.4rem;height:.4rem;border-radius:50%;background:var(--indigo)}
+
+/* methods */
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}
+.step{background:var(--surface);border-radius:1.5rem;padding:1.75rem;display:grid;gap:.75rem;align-content:start;min-width:0}
+.step .big{font-size:3rem;font-weight:700;line-height:1.05;letter-spacing:-0.035em;font-variant-numeric:tabular-nums;margin-top:.25rem}
+.step h3{font-size:1.3125rem;font-weight:600;letter-spacing:-0.016em}
+.step p,.step li{font-size:1rem;color:var(--ink-2);line-height:1.5}
+.step ul{margin:0;padding-left:1.1rem;display:grid;gap:.3rem}
+.phases{display:grid;gap:3rem}
+.ph-h{display:flex;align-items:center;gap:.65rem;font-size:1.3125rem;font-weight:600;letter-spacing:-0.016em;margin-bottom:1rem}
+.where .cities{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem 1.25rem}
+.where .eyebrow{color:var(--indigo)}
+.cities{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.25rem;margin-top:.25rem}
+.where .note{margin-top:.25rem}
+.city{display:grid;gap:.15rem}
+.city b{font-size:1.3125rem;font-weight:600;letter-spacing:-0.016em}
+.city span{font-size:.9375rem;color:var(--muted)}
+.axes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin-top:3rem}
+.axis{background:var(--surface);border-radius:1.5rem;padding:1.75rem;display:grid;gap:.6rem;align-content:start}
+.axis h3{font-size:1.5rem;font-weight:600;letter-spacing:-0.02em}
+.axis p{color:var(--ink-2)}
+.track,.scale{display:none}
+.note{font-size:.875rem;line-height:1.45;color:var(--muted);margin-top:.85rem;max-width:56rem}
+
+/* findings */
+.sub-h{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin:5rem 0 1.25rem}
+.sub-h h3{font-size:2rem;font-weight:700;letter-spacing:-0.025em;line-height:1.12}
+.qual-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem}
+.qf{background:var(--surface);border-radius:1.5rem;padding:1.75rem;display:grid;gap:.6rem;align-content:start;min-width:0}
+.qf .k{font-size:.875rem;font-weight:600;color:var(--muted);display:flex;gap:.5rem;align-items:center}
+.qf p{font-size:1.75rem;line-height:1.14;font-weight:700;letter-spacing:-0.025em}
+.qf small{font-size:1rem;color:var(--ink-2);line-height:1.47}
+
+/* interactive chart */
+.viz{background:var(--surface);border-radius:1.75rem;padding:1.75rem 1.75rem 1.25rem;position:relative}
+.viz-top{display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.6rem}
+.seg{display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;border-radius:.6rem;padding:2px;background:rgb(118 118 128 / 12%);position:relative;isolation:isolate}
+.seg .thumb{position:absolute;top:2px;bottom:2px;left:0;border-radius:.5rem;background:var(--surface);box-shadow:0 3px 8px rgb(0 0 0 / 12%),0 3px 1px rgb(0 0 0 / 4%);z-index:-1;transition:transform .35s var(--spring),width .35s var(--spring)}
+:root[data-theme="dark"] .seg .thumb{background:#636366}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg .thumb{background:#636366}}
+.seg button{font:500 .8125rem/1 var(--sys);letter-spacing:-0.006em;color:var(--ink);background:none;border:0;padding:.5rem .9rem;border-radius:.5rem;cursor:pointer;white-space:nowrap}
+.seg button[aria-pressed="true"]{font-weight:600}
+.seg button:active{opacity:.6}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.875rem;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:.4rem}
+.legend i{width:.65rem;height:.65rem;border-radius:50%;display:inline-block}
+.hint{font-size:.875rem;color:var(--muted)}
+.swipe{display:none}
+@media (max-width:640px){.swipe{display:inline}}
+.chart-box{overflow-x:auto;margin-top:.5rem;overscroll-behavior-x:contain}
+#quad svg{display:block;width:100%;min-width:600px;height:auto}
+svg text{font-family:var(--sys)}
+.pt{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pt .dot{transform-box:fill-box;transform-origin:center;transition:transform .3s var(--spring)}
+@media (hover:hover) and (pointer:fine){.pt:hover .dot{transform:scale(1.3)}}
+.pt.on .dot{transform:scale(1.3)}
+.pt:active .dot{transform:scale(1.1);transition-duration:.1s}
+.pt:focus{outline:none}
+.pt:focus-visible .ring{stroke:var(--indigo);stroke-width:3}
+.pt text{transition:opacity .2s ease}
+.pt.dim{opacity:.32;transition:opacity .2s ease}
+.tip{position:absolute;z-index:4;width:18.5rem;background:var(--tip-bg);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border-radius:1.1rem;box-shadow:var(--shadow-lg);padding:1.1rem 1.15rem;display:grid;gap:.7rem;pointer-events:none;font-size:.875rem;
+  opacity:0;transform:scale(.94);filter:blur(6px);transition:opacity .18s ease-out,transform .32s var(--spring),filter .2s ease-out}
+.tip.in{opacity:1;transform:none;filter:none}
+.tip .t-q{font-size:.75rem;font-weight:600;letter-spacing:.01em}
+.tip .t-n{font-size:1.0625rem;font-weight:600;line-height:1.24;letter-spacing:-0.016em}
+.tip .t-row{display:grid;grid-template-columns:auto 1fr;gap:.25rem .9rem;align-items:center}
+.tip .t-big{font-size:2.75rem;font-weight:700;line-height:1;letter-spacing:-0.035em;font-variant-numeric:tabular-nums}
+.tip .t-meta{font-size:.8125rem;line-height:1.38;color:var(--ink-2);display:grid;gap:.1rem}
+.tip .t-meta b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.tip .t-scale{position:relative;height:.375rem;border-radius:999px;background:rgb(118 118 128 / 18%)}
+.tip .t-scale i{position:absolute;inset:0 auto 0 0;border-radius:999px}
+.tip .t-scale u{position:absolute;top:-.2rem;bottom:-.2rem;width:2px;border-radius:1px;background:var(--muted)}
+.tip .t-axis{display:flex;justify-content:space-between;font-size:.6875rem;letter-spacing:.01em;color:var(--muted);font-variant-numeric:tabular-nums}
+.tip .t-go{font-size:.8125rem;color:var(--indigo);font-weight:600}
+.tip.static{position:static;width:auto;margin-top:1rem;pointer-events:auto;background:var(--shade);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+
+#ranked{display:grid;gap:0;margin-top:.5rem}
+.rk{display:grid;grid-template-columns:1.75rem minmax(0,1fr) minmax(90px,1.15fr) 2.5rem;gap:.85rem;align-items:center;padding:.5rem .6rem;border-radius:.75rem;cursor:pointer;font-size:.9375rem;letter-spacing:-0.01em;transition:background-color .2s ease,transform .1s ease-out;-webkit-tap-highlight-color:transparent}
+@media (hover:hover) and (pointer:fine){.rk:hover{background:var(--shade)}}
+.rk.on{background:var(--shade)}
+.rk:active{transform:scale(.99)}
+.rk .r{font-size:.8125rem;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.rk .nm{color:var(--ink);min-width:0}
+.rk .nm .tag.q-TD{background:var(--marigold-soft);color:var(--marigold-ink)}
+.rk .nm .tag.q-TS{background:var(--mt-soft);color:var(--mt-ink)}
+.rk .nm .tag.q-VA{background:var(--va-soft);color:var(--va-ink)}
+.rk .nm .tag.q-MT{background:rgb(118 118 128 / 16%);color:var(--ink-2)}
+.rk .nm .tag{margin-left:.4rem;font-size:.6875rem;padding:.12rem .5rem}
+.rk .b{height:.5rem;background:rgb(118 118 128 / 12%);border-radius:999px;position:relative}
+.rk .b i{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--bar)}
+.rk .b u{position:absolute;top:-.3rem;bottom:-.3rem;width:0;border-left:1.5px dashed var(--muted)}
+.rk.hi .b i{background:var(--indigo)}
+.rk .v{font-size:.9375rem;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.tier{font-size:.8125rem;font-weight:600;color:var(--muted);padding:1.25rem .6rem .35rem}
+.tier:first-child{padding-top:.5rem}
+
+.top5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.75rem}
+.t5{background:var(--surface);border-radius:1.25rem;padding:1.25rem;display:grid;gap:.75rem;align-content:space-between;min-width:0;box-shadow:inset 0 0 0 0 transparent}
+.t5 .k{font-size:.8125rem;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.t5 p{font-size:1.0625rem;font-weight:600;line-height:1.29;letter-spacing:-0.016em}
+.t5 .wm{font-size:.75rem;font-weight:600;padding:.3rem .65rem;border-radius:999px;justify-self:start}
+.t5 .wm.yes{background:var(--indigo-soft);color:var(--indigo)}
+.t5 .wm.no{background:var(--marigold-soft);color:var(--marigold-ink)}
+.t5.no{box-shadow:inset 0 0 0 2px var(--marigold)}
+
+/* impact */
+.impact{padding-block:5rem 0;display:grid;grid-template-columns:minmax(0,1fr);gap:1.5rem}
+.impact:first-of-type{padding-top:0}
+.imp-head{display:grid;grid-template-columns:minmax(0,1fr);gap:.5rem;max-width:48rem;margin-bottom:.75rem}
+.imp-head .k{font-size:1.0625rem;font-weight:600;color:var(--marigold-ink);letter-spacing:-0.01em}
+.imp-head h3{font-size:clamp(2rem,3.6vw,2.5rem);font-weight:700;letter-spacing:-0.028em;line-height:1.1}
+.imp-head .sub{margin-top:.85rem;color:var(--ink-2);font-size:1.1875rem;line-height:1.47;letter-spacing:-0.014em;max-width:40rem}
+.loc{display:inline-flex;gap:.5rem;align-items:center;margin:1rem .4rem 0 0;font:500 .875rem/1 var(--sys);letter-spacing:-0.01em;color:var(--ink);background:var(--surface);border:0;border-radius:999px;padding:.6rem 1rem .6rem .8rem;cursor:pointer;box-shadow:var(--shadow-sm);transition:transform .1s ease-out,background-color .2s ease;-webkit-tap-highlight-color:transparent}
+.loc i{width:.6rem;height:.6rem;border-radius:50%}
+.loc b{font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.loc:active{transform:scale(.97)}
+.ev{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;align-items:stretch}
+.ev.wide{grid-template-columns:minmax(0,1fr)}
+.ev.three{grid-template-columns:repeat(2,minmax(0,1fr));gap:2rem 1.25rem}
+.ev.three>figure:nth-child(3){grid-column:1 / -1;justify-self:center;width:calc(50% - .625rem)}
+@media (max-width:860px){.ev.three{grid-template-columns:minmax(0,1fr)}.ev.three>figure:nth-child(3){width:100%}}
+.ev.r3{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+blockquote{margin:0;padding:2rem;background:var(--surface);border-radius:1.5rem;display:grid;gap:1rem;align-content:center}
+blockquote p{font-size:1.75rem;line-height:1.18;font-weight:600;letter-spacing:-0.024em;color:var(--ink)}
+blockquote cite{font-style:normal;font-size:.875rem;color:var(--muted)}
+.concern p{color:var(--marigold-ink)}
+.rec{display:grid;gap:.4rem;border-radius:1.5rem;padding:1.5rem 1.75rem;background:var(--indigo-soft)}
+.rec .lab{font-size:.875rem;font-weight:600;color:var(--indigo)}
+.rec p{color:var(--ink);font-size:1.1875rem;line-height:1.42;letter-spacing:-0.014em;font-weight:500}
+.shipped{display:grid;gap:.75rem;align-content:start}
+.shipped .lab{font-size:.875rem;font-weight:600;color:var(--indigo)}
+.shot{border-radius:1.25rem;overflow:hidden;background:#0E0E10}
+.shot img{width:100%}
+.shot.ui{aspect-ratio:16/9;max-width:100%}
+.shot.ui img{height:100%;object-fit:cover;object-position:top}
+.ev figure img{border-radius:1.25rem}
+.considered .shot img{filter:grayscale(1);opacity:.55}
+.tagged{position:relative}
+.pic-tag{position:absolute;z-index:1;top:.85rem;left:.85rem;font-size:.75rem;font-weight:600;letter-spacing:.005em;padding:.2rem .6rem;border-radius:999px;color:var(--indigo);background:linear-gradient(var(--indigo-soft),var(--indigo-soft)),var(--surface)}
+.when{position:absolute;top:.85rem;right:.85rem;font-size:.8125rem;font-weight:600;letter-spacing:-0.005em;padding:.35rem .75rem;border-radius:999px;box-shadow:0 2px 8px rgb(0 0 0 / 25%)}
+.when.night{background:#0071E3;color:#fff}
+.when.morning{background:#FFD60A;color:#1D1D1F}
+.win{display:grid;gap:.5rem;align-content:center;background:var(--surface);border-radius:1.5rem;padding:2rem}
+.win .big{font-size:clamp(4rem,9vw,6rem);font-weight:700;line-height:1;letter-spacing:-0.045em;color:var(--indigo)}
+.win p{max-width:24ch;color:var(--ink-2);font-size:1.0625rem}
+.changes{display:grid;gap:.6rem}
+
+/* simple bars */
+.bars{display:grid;gap:.55rem;background:var(--surface);border-radius:1.5rem;padding:1.75rem;align-content:start}
+.bars-t{font-size:1.3125rem;font-weight:700;letter-spacing:-0.02em;line-height:1.2}
+.bars .bars-t + h4{font-size:.9375rem;font-weight:500;color:var(--muted)}
+.bars h4{font-size:1.1875rem;font-weight:600;letter-spacing:-0.016em;margin-bottom:.5rem}
+.br{display:grid;grid-template-columns:minmax(90px,var(--lw,130px)) minmax(0,1fr) 2.25rem;gap:.75rem;align-items:center;font-size:.875rem;color:var(--ink-2)}
+.br .b{height:.6rem;position:relative}
+.br .b i{position:absolute;inset:0 auto 0 0;background:var(--bar);border-radius:999px}
+.br.hl{color:var(--ink);font-weight:600}
+.br.hl .b i{background:var(--indigo)}
+.br.hl2 .b i{background:color-mix(in srgb,var(--indigo) 45%,var(--bar))}
+.br.hl2{color:var(--ink)}
+.br.focus{background:var(--marigold-soft);box-shadow:inset 0 0 0 1.5px var(--marigold);border-radius:.6rem;padding:.45rem .6rem;margin:.15rem -.6rem;color:var(--marigold-ink)}
+.br.focus .v{color:var(--marigold-ink);font-weight:700}
+/* maxdiff ranked chart */
+.maxd{min-width:0;background:var(--surface);border-radius:1.5rem;padding:1.75rem;display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}
+.mx-list{list-style:none;margin:0;padding:0;display:grid;gap:3px;position:relative}
+.mx{display:grid;grid-template-columns:1.25rem minmax(0,15rem) minmax(0,1fr) 2rem;gap:.6rem;align-items:center;font-size:.6875rem;color:var(--muted);padding:1px .5rem;border-radius:.4rem}
+.mx-r{text-align:right;font-variant-numeric:tabular-nums}
+.mx-n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mx-b{height:.45rem;position:relative;background:rgb(118 118 128 / 10%);border-radius:999px}
+.mx-b i{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--bar)}
+.mx-b::after{content:"";position:absolute;top:-.4rem;bottom:-.4rem;left:62.5%;border-left:2px dashed var(--ink-2)}
+.mx.focus .mx-b::after{top:-.85rem;bottom:-.85rem}
+.mx-avg .mx-b{background:none;height:1.1rem}
+.mx-split{position:relative;height:0;border-top:1.5px solid var(--ink-2);margin:1.15rem 0 .75rem}
+.mx-split span{position:absolute;left:.5rem;font-size:.625rem;font-weight:600;color:var(--ink-2);letter-spacing:.01em}
+.mx-split .up{bottom:.25rem}
+.mx-split .down{top:.25rem}
+.mx-avg .mx-b::after{top:1.15rem;bottom:-.4rem}
+.mx-avg em{position:absolute;left:62.5%;top:0;transform:translateX(-50%);font-style:normal;font-size:.6875rem;font-weight:600;color:var(--ink-2);white-space:nowrap}
+.mx-v{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.mx.focus{font-size:.9375rem;color:var(--marigold-ink);font-weight:700;background:var(--marigold-soft);box-shadow:inset 0 0 0 1.5px var(--marigold);padding:.45rem .5rem;margin:.2rem 0}
+.mx.focus .mx-b{height:.65rem}
+.mx.focus .mx-b i{background:var(--marigold)}
+@media (max-width:640px){.maxd{padding:1.25rem}.mx{grid-template-columns:1rem minmax(0,8.5rem) minmax(0,1fr) 1.6rem;gap:.4rem}.mx.focus{font-size:.8125rem}}
+/* subgroup heat table */
+.subgrp{min-width:0;grid-template-columns:minmax(0,1fr);background:var(--surface);border-radius:1.5rem;padding:1.75rem;display:grid;gap:1rem}
+.subgrp>*{min-width:0}
+.subgrp-h{display:grid;gap:.4rem;justify-items:start}
+.subgrp-h h4{font-size:1.1875rem;font-weight:600;letter-spacing:-0.016em}
+.subgrp-h p{font-size:1.0625rem;color:var(--ink);font-weight:500}
+.sg-scroll{overflow-x:auto;margin-inline:-.25rem;padding-inline:.25rem}
+.sg{border-collapse:separate;border-spacing:3px;width:100%;min-width:34rem;font-size:.8125rem}
+.sg thead th{font-weight:600;color:var(--muted);text-align:center;padding:.25rem .2rem .5rem;font-size:.75rem;line-height:1.2;vertical-align:bottom}
+.sg thead th.focus-col{color:var(--marigold-ink)}
+.sg tbody th{font-weight:400;text-align:left;color:var(--ink-2);padding:.2rem .75rem .2rem 0;white-space:nowrap}
+.sg td{height:1.6rem;width:15%;border-radius:.35rem;text-align:center;font-size:.6875rem;font-weight:600;color:var(--muted)}
+.sg td.hi,.sg-legend i.hi{background:rgb(52 199 89 / 30%)}
+.sg td.mid,.sg-legend i.mid{background:rgb(118 118 128 / 12%)}
+.sg td.lo,.sg-legend i.lo{background:rgb(255 59 48 / 18%)}
+.sg td.kids{background:rgb(118 118 128 / 12%)}
+.sg tbody th{font-size:.6875rem;color:var(--muted)}
+.sg thead th{font-size:.625rem}
+.sg td{height:1.3rem}
+.sg tr.voice-row td{height:2rem}
+.sg thead th.focus-col{font-size:.875rem;font-weight:700}
+.sg tr.voice-row th{font-size:.9375rem;color:var(--marigold-ink);font-weight:700;background:var(--marigold-soft);border-radius:.35rem;padding-left:.5rem;box-shadow:inset 0 0 0 1.5px var(--marigold)}
+.sg td.focus{box-shadow:inset 0 0 0 2.5px var(--marigold),0 0 0 3px var(--marigold-soft)}
+.sg-legend{display:flex;flex-wrap:wrap;gap:.5rem 1.1rem;font-size:.8125rem;color:var(--ink-2)}
+.sg-legend span{display:inline-flex;align-items:center;gap:.4rem}
+.sg-legend i{display:inline-grid;place-items:center;min-width:1.4rem;height:.9rem;border-radius:.25rem;font-style:normal;font-size:.5625rem;font-weight:600;color:var(--muted)}
+.sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sg td,.sg th{position:relative}
+.sg-scroll{position:relative}
+@media (max-width:640px){.subgrp{padding:1.25rem}.sg{min-width:0;border-spacing:2px;font-size:.75rem}.sg tbody th{white-space:normal;line-height:1.25;padding-right:.4rem;min-width:7.5rem}.sg{table-layout:fixed;width:100%}.sg thead th:first-child{width:38%}.sg thead th{font-size:.5625rem;padding-inline:0;overflow-wrap:anywhere;hyphens:auto}.sg tbody th{min-width:0}.sg td{font-size:.5625rem}.sg thead th.focus-col{font-size:.6875rem;overflow-wrap:normal;hyphens:none}.sg tr.voice-row th{font-size:.8125rem}}
+.br .v{font-size:.8125rem;font-weight:500;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.bars .src{font-size:.8125rem;color:var(--muted);margin-top:.5rem;line-height:1.45}
+.bars.genre .br{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 1.75rem;font-size:.8125rem}
+.bars.genre .br .b{height:.5rem}
+
+/* timeline */
+.tl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}
+.tl .panel h3{font-size:2.25rem;font-weight:700;letter-spacing:-0.03em;line-height:1.05}
+.phase{display:grid;grid-template-columns:.75rem minmax(0,1fr);gap:.6rem;font-size:1rem}
+.phase i{width:.5rem;height:.5rem;border-radius:50%;background:var(--indigo);margin-top:.5rem}
+.phase span{color:var(--muted);font-size:.875rem;display:block}
+.faster{margin-top:4.5rem;display:grid;gap:1.5rem}
+.faster-h{display:grid;gap:.5rem}
+.faster-h h3{font-size:clamp(2rem,4vw,2.75rem);font-weight:700;letter-spacing:-0.03em;line-height:1.08}
+.faster-h b{font-weight:600;color:var(--marigold-ink);font-size:1.0625rem}
+.fp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}
+.fp div{display:grid;gap:.3rem;font-size:.9375rem;color:var(--ink-2);align-content:start}
+.fp div b{color:var(--ink);font-size:1.1875rem;font-weight:600;letter-spacing:-0.016em}
+.fp div span{font-size:.8125rem;font-weight:600;color:var(--muted)}
+
+footer{padding-block:2.5rem 4rem;color:var(--muted);font-size:.75rem;letter-spacing:-0.002em}
+footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:1.25rem}
+
+@media (max-width:860px){
+  .hero-grid{grid-template-columns:minmax(0,1fr);gap:2rem}
+  .hero{padding-block:2.5rem 2rem}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two,.axes,.ev,.ev.r3,.tl,.fp,.qual-grid,.flow{grid-template-columns:minmax(0,1fr)}
+  .cities{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .top5{grid-template-columns:repeat(2,minmax(0,1fr))}
+  section.chapter{padding-block:4.5rem}
+  .sub-h{margin-top:3.5rem}
+  .impact{padding-top:4rem}
+}
+@media (max-width:640px){
+  .viz{padding:1.25rem 1rem 1rem;border-radius:1.5rem}
+  .panel,.step,.axis,.qf,.bars,blockquote,.win,.faster{padding:1.4rem}
+}
+@media (max-width:520px){
+  .rk{grid-template-columns:1.4rem minmax(0,1fr) 2.2rem;gap:.3rem .75rem}
+  .rk .b{grid-column:2 / 4;order:5}
+  .seg button{padding:.5rem .7rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important}
+  .tip{transform:none!important;filter:none!important;transition:opacity .2s ease}
+  .pt .dot,.seg .thumb,.loc,.rk{transition:none!important}
+  .pt:hover .dot,.pt.on .dot,.pt:active .dot,.loc:active,.rk:active{transform:none!important}
+}
+@media (prefers-reduced-transparency:reduce){
+  .nav,body::before{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}
+  .tip{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-contrast:more){
+  .nav{box-shadow:0 1px 0 var(--ink-2)}
+  .tip,.panel,.step,.axis,.qf,.viz,.fact,.t5,.bars,blockquote,.win,.faster{outline:1px solid var(--ink-2)}
+}
+html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
+</style>
+</head>
+<body>
+
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <b>TV in India</b>
+    <a href="#background">Background</a>
+    <a href="#methods">Methods</a>
+    <a href="#findings">Findings</a>
+    <a href="#impact">Impact</a>
+    <a href="#timeline">Timeline</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">UX research case study</div>
+        <h1>TV in India</h1>
+        <p class="lede">How Mixed Methods Research Shaped a Smart-TV UI in India</p>
+        <div class="byline"><span><b>Yan Luo</b>, UX researcher</span><span>Uncover and prioritize user needs</span></div>
+      </div>
+      <figure>
+        <img src="/tv-in-india/img/hero.webp" alt="A family in a living room in India watching a news channel on a single TV, with a toddler standing in front of the screen" width="1353" height="902">
+        <figcaption>One TV in the living room, shared across generations. Faces obscured.</figcaption>
+      </figure>
+    </div>
+    <div class="facts" role="list">
+      <div class="fact" role="listitem"><span class="n">24</span><span class="l">diary participants<br>uncover TV viewing needs</span></div>
+      <div class="fact" role="listitem"><span class="n">12</span><span class="l">in-depth interviews<br>concept evaluation</span></div>
+      <div class="fact" role="listitem"><span class="n">1,000</span><span class="l">survey respondents ranking 23 needs and assessing satisfaction</span></div>
+      <div class="fact" role="listitem"><span class="n">5</span><span class="l">key product changes directly informed by research</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="chapter" id="background">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="num">Background</div>
+      <div>
+        <h2>Entering India with unknown needs</h2>
+        <div class="prose">
+          <p><strong>Objectives:</strong> understand TV viewing behavior, needs and pain points, and gather user feedback on the new UI to localize the experience before launch.</p>
+        </div>
+      </div>
+    </div>
+    <div class="two indent">
+      <div class="panel">
+        <span class="tag">Classic UI · old</span>
+        <div class="shot ui"><img src="/tv-in-india/img/ui-classic.webp" alt="Classic Android TV home screen: rows of app shortcuts grouped under Video, Music and Apps over a mountain wallpaper" width="738" height="415"></div>
+        <h3>App launcher</h3>
+        <p>A grid of app shortcuts. To decide what to watch, a viewer opens each app one at a time.</p>
+      </div>
+      <div class="panel">
+        <span class="tag qual">Smart UI · new</span>
+        <div class="shot ui"><img src="/tv-in-india/img/ui-smart.webp" alt="New smart TV home screen: For you tab with a featured show and a Top picks for you row, with tabs for Live, Movies, Shows, Apps and Library" width="1400" height="733"></div>
+        <h3>Cross-platform aggregator</h3>
+        <p>“All-in-one”: Content aggregated from multiple streaming services and organized into tabs like For You.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="methods">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="num">Methods</div>
+      <div>
+        <h2>Uncover needs, then prioritize them</h2>
+        <div class="prose">
+          <p>To solve an ambiguous 0-to-1 problem, Phase 1 uncovered contextual behaviors, needs and UI reactions qualitatively; Phase 2 prioritized user needs quantitatively to guide resource allocation.</p>
+        </div>
+      </div>
+    </div>
+    <div class="indent phases">
+      <div class="phase-group">
+      <h3 class="ph-h"><span class="tag qual">Phase 1 · Qual</span>Uncover needs</h3>
+      <div class="flow">
+        <div class="step">
+          <span class="big">N=24</span>
+          <h3>Diary study</h3>
+          <p>A diary captures in-the-moment behaviors and changing user needs over time.</p>
+        </div>
+        <div class="step">
+          <span class="big">N=12</span>
+          <h3>In-depth interviews</h3>
+          <p>90-minute sessions to follow up on diary entries and evaluate UI concepts.</p>
+        </div>
+        <div class="step where">
+          <span class="eyebrow">4 cities</span>
+          <div class="cities" aria-label="Qualitative recruitment cities">
+            <div class="city"><b>Mumbai</b><span>West · Tier 1 · Marathi</span></div>
+            <div class="city"><b>Kolkata</b><span>East · Tier 1 · Bengali</span></div>
+            <div class="city"><b>Lucknow</b><span>North · Tier 2 · Hindi</span></div>
+            <div class="city"><b>Coimbatore</b><span>South · Tier 2 · Tamil</span></div>
+          </div>
+          <p class="note">Each city: 6 diary participants, 3 of whom were interviewed.</p>
+        </div>
+      </div>
+      </div>
+      <div class="phase-group">
+      <h3 class="ph-h"><span class="tag quant">Phase 2 · Quant</span>Prioritize needs</h3>
+      <div class="flow">
+        <div class="step survey">
+          <span class="big">n=1,000</span>
+          <h3>Needs-prioritization survey</h3>
+        </div>
+        <div class="step axis">
+          <span class="eyebrow">Axis 1</span>
+          <h3>How important</h3>
+          <p>Use MaxDiff to rank 23 needs collected in Qual.</p>
+          <div class="track"></div><div class="scale"><span>High importance</span><span>Low</span></div>
+        </div>
+        <div class="step axis">
+          <span class="eyebrow">Axis 2</span>
+          <h3>How well met?</h3>
+          <p>Measure satisfaction with current solutions.</p>
+          <div class="track met"></div><div class="scale"><span>Well met</span><span>Unmet</span></div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="findings">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="num">Key findings</div>
+      <div>
+        <h2>What viewers need and where current solutions fall short</h2>
+        <div class="prose"><p>The Qualitative phase surfaced four themes; the survey ranked 23 needs and measured how well they’re met.</p></div>
+      </div>
+    </div>
+
+    <div class="indent">
+      <div class="qual-grid">
+        <div class="qf"><span class="k">01 · <span class="tag qual">Diary</span></span><p>Privacy and control are important.</p><small>TV is a shared family device in India.</small></div>
+        <div class="qf"><span class="k">02 · <span class="tag qual">Diary</span></span><p>Language filters are helpful.</p><small>Cable groups channels by language, making navigation easier.</small></div>
+        <div class="qf"><span class="k">03 · <span class="tag qual">Interview</span></span><p>"All-in-one" addressed pain points.</p><small>Cross-app curation eliminates the app-by-app hunt.</small></div>
+        <div class="qf"><span class="k">04 · <span class="tag qual">Interview</span></span><p>Content categories need to be localized.</p><small>For you, Movies and Shows need local genres and languages.</small></div>
+      </div>
+
+      <div class="sub-h"><h3>Importance × well met</h3><span class="tag quant">Survey · n=1,000</span></div>
+      <div class="viz" id="viz">
+        <div class="viz-top">
+          <div class="seg" role="group" aria-label="Chart view"><span class="thumb" aria-hidden="true"></span>
+            <button type="button" id="btn-quad" aria-pressed="true">Quadrants</button>
+            <button type="button" id="btn-rank" aria-pressed="false">All 23 needs, ranked</button>
+          </div>
+          <div class="legend" id="legend">
+            <span><i style="background:var(--marigold)"></i>Not well met</span>
+            <span><i style="background:var(--indigo)"></i>Well met</span>
+          </div>
+        </div>
+        <p class="hint" id="hint">Hover or tap a need to see its MaxDiff score.<span class="swipe"> Scroll the chart sideways for the well-met half.</span></p>
+        <div class="chart-box" id="quad"></div>
+        <div id="ranked" hidden></div>
+        <div class="tip" id="tip" hidden role="status" aria-live="polite"></div>
+        <p class="note" id="quad-note">Y-axis: MaxDiff importance score (100 = average, ≥120 = top tier). X-axis: Needs are grouped as “well-met” vs. “unmet”; horizontal spacing is jittered for readability. Switch to ranked view to see all 23 needs.</p>
+      </div>
+
+      <div class="sub-h"><h3>Zooming into the Top 5 Needs</h3></div>
+      <div class="top5">
+        <div class="t5"><span class="k">#1 · 151</span><p>Browse clearly labeled family-friendly content</p><span class="wm yes">Well met: yes</span></div>
+        <div class="t5 no"><span class="k">#2 · 145</span><p>Access all my content in one place</p><span class="wm no">Well met: no</span></div>
+        <div class="t5"><span class="k">#3 · 142</span><p>Switch quickly between devices connected to the TV</p><span class="wm yes">Well met: yes</span></div>
+        <div class="t5"><span class="k">#4 · 139</span><p>Continue watching across streaming services</p><span class="wm yes">Well met: yes</span></div>
+        <div class="t5 no"><span class="k">#5 · 122</span><p>Consolidate subscriptions into one discounted payment</p><span class="wm no">Well met: no</span></div>
+      </div>
+      <div class="prose" style="margin-top:20px">
+        <p>Ranking alone would put family-friendly content first. Adding the well-met lens reframes the order: <strong>all-in-one access and bundled subscriptions</strong> are both highly important and poorly served, which makes them the top differentiators.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="chapter" id="impact">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="num">Impact</div>
+      <div>
+        <h2>From findings to shipped changes</h2>
+        <div class="prose"><p>Five threads, each tied back to where it sits on the prioritization map. Select a chip to see that need on the chart.</p></div>
+      </div>
+    </div>
+
+    <article class="impact" id="impact-all-in-one">
+      <div class="imp-head">
+        <div class="k">Top differentiator</div>
+        <div>
+          <h3>Deepen "all-in-one" with continue watching across services</h3>
+          <p class="sub">All-in-one access (#2, not met) is the UI’s primary hook, while continue watching (#4) is already well-met within individual apps. Unify and strengthen the all-in-one value proposition by integrating cross-service “continue watching.”</p>
+          <button class="loc" type="button" data-focus="allinone"><i style="background:var(--marigold)"></i>All content in one place <b>145</b></button>
+          <button class="loc" type="button" data-focus="continue"><i style="background:var(--indigo)"></i>Continue watching <b>139</b></button>
+        </div>
+      </div>
+      <div class="ev wide indent">
+        <div class="shipped">
+          <span class="lab">Shipped</span>
+          <div class="shot"><img src="/tv-in-india/img/continue-watching.webp" alt="Smart TV Shows tab with a Continue watching row combining titles from several streaming services" width="1024" height="543" loading="lazy"></div>
+          <figcaption>A continue-watching row that pulls progress from every connected service, so viewers decide without opening each app.</figcaption>
+        </div>
+      </div>
+    </article>
+
+    <article class="impact" id="impact-bundle">
+      <div class="imp-head">
+        <div class="k">Top differentiator</div>
+        <div>
+          <h3>Bundle subscriptions into one payment</h3>
+          <p class="sub">The most unmet need in the study: 26% said "I can't do this". It was about more than saving money. Viewers wanted the convenience of a single payment.</p>
+          <button class="loc" type="button" data-focus="bundle"><i style="background:var(--marigold)"></i>Bundle subscriptions <b>122</b></button>
+        </div>
+      </div>
+      <div class="ev r3 indent">
+        <blockquote><p>"If everything gets accommodated in a single package with a discount, that's great."</p><cite>Survey respondent, on how the need could be improved</cite></blockquote>
+        <div class="shipped">
+          <span class="lab">Shipped</span>
+          <div class="shot" style="background:#fff"><img src="/tv-in-india/img/bundle.webp" alt="Tata Sky Binge+ Android TV set-top box offer bundling several streaming apps and Amazon Prime Video for one price" width="1400" height="328" loading="lazy"></div>
+          <figcaption>The research shaped a bundled service offered through Tata Sky Binge+ on Android TV.</figcaption>
+        </div>
+      </div>
+    </article>
+
+    <article class="impact" id="impact-profiles">
+      <div class="imp-head">
+        <div class="k">Privacy &amp; control</div>
+        <div>
+          <h3>Localize profiles for a shared family TV</h3>
+          <p class="sub">Shared TVs (averaging 4.5 users) created intense anxiety around adult content during family co-viewing, restricting personal profiles to solo or couple viewing.</p>
+          <button class="loc" type="button" data-focus="family"><i style="background:var(--indigo)"></i>Family-labeled content <b>151</b></button>
+          <button class="loc" type="button" data-focus="secure"><i style="background:var(--marigold)"></i>Secure personal profiles <b>104</b></button>
+        </div>
+      </div>
+      <div class="ev indent">
+        <blockquote><p>"If some adult scene comes up during family watching, it is so embarrassing."</p><cite>P19, M32, Traditionalist, Coimbatore</cite></blockquote>
+        <figure><div class="tagged"><span class="pic-tag">Diary</span><img src="/tv-in-india/img/family-viewing.webp" alt="Diary photo of a family watching TV together in their living room, faces obscured" width="1002" height="524" loading="lazy" style="border-radius:8px"></div><figcaption>Family viewing time with a child, from P19's diary.</figcaption></figure>
+      </div>
+      <div class="rec indent"><span class="lab">Recommendation</span><p>Add a lock to personal profiles on the TV, and make the family profile the default.</p></div>
+      <div class="ev r3 indent">
+        <div class="panel changes">
+          <span class="tag qual" style="justify-self:start">Shipped</span>
+          <h3>Profile Lock</h3>
+          <ul class="list"><li>PIN required for personal profile login</li></ul>
+          <h3>Default to Family Profile</h3>
+          <ul class="list"><li>Instead of “last active” profile</li></ul>
+        </div>
+        <div class="shot"><img src="/tv-in-india/img/profile-lock.webp" alt="Profile lock dialog asking for a four-digit PIN over the smart TV home screen" width="1024" height="577" loading="lazy"></div>
+      </div>
+      <div class="ev indent">
+        <figure><div class="tagged"><img src="/tv-in-india/img/personal-profile.webp" alt="Illustration of a couple watching TV late in the evening on a personal profile home screen" width="1024" height="559" loading="lazy"><span class="when night">Sat night</span></div><figcaption><b>Personal profile</b> for solo viewing or co-viewing with a partner. AI-generated illustration.</figcaption></figure>
+        <figure><div class="tagged"><img src="/tv-in-india/img/family-account.webp" alt="Illustration of a family with children watching TV on the family profile home screen on a Sunday morning" width="1024" height="559" loading="lazy"><span class="when morning">Sun morning</span></div><figcaption><b>Family profile</b> instead of last active account, is the default upon turning on TV. AI-generated illustration.</figcaption></figure>
+      </div>
+    </article>
+
+    <article class="impact" id="impact-assistant">
+      <div class="imp-head">
+        <div class="k">Voice control</div>
+        <div>
+          <h3>Localize Google Assistant</h3>
+          <p class="sub">Despite heavy phone usage, voice search stalled on TVs due to poor accent recognition and inaccurate results—creating fear of surfacing inappropriate content during shared family co-viewing.</p>
+          <button class="loc" type="button" data-focus="voice"><i style="background:var(--marigold)"></i>Use voice to search <b>108</b></button>
+        </div>
+      </div>
+      <div class="ev indent">
+        <div class="bars" style="--lw:150px">
+          <span class="tag qual" style="justify-self:start">Diary</span>
+          <h4>How did you control your TV as you were watching?</h4>
+          <div class="br"><span>TV remote</span><span class="b"><i style="width:100%"></i></span><span class="v">189</span></div>
+          <div class="br"><span>Set-top box remote</span><span class="b"><i style="width:48.7%"></i></span><span class="v">92</span></div>
+          <div class="br"><span>Mobile app</span><span class="b"><i style="width:19%"></i></span><span class="v">36</span></div>
+          <div class="br"><span>Other</span><span class="b"><i style="width:13.2%"></i></span><span class="v">25</span></div>
+          <div class="br"><span>TV buttons</span><span class="b"><i style="width:2.6%"></i></span><span class="v">5</span></div>
+          <div class="br hl focus"><span>Voice command</span><span class="b"><i style="width:1.6%;background:var(--marigold)"></i></span><span class="v">3</span></div>
+          <p class="src">Viewing sessions logged across all diaries.</p>
+        </div>
+        <div style="display:grid;gap:16px">
+          <blockquote class="concern"><span class="tag qual" style="justify-self:start">Interview</span><p>Inaccurate search results during family co-viewing created embarrassment.</p></blockquote>
+          <blockquote><p>"I feel voice (assistant) cannot understand us."</p><cite>P04, M32, Content Mogul, Kolkata</cite></blockquote>
+        </div>
+      </div>
+      <div class="subgrp indent">
+        <div class="subgrp-h">
+          <span class="tag quant">Survey · n=1,000</span>
+          <h4>Needs prioritization by subgroup</h4>
+          <p>Quantitative results showed that couples highly valued voice search.</p>
+        </div>
+        <div class="sg-scroll"><table class="sg">
+          <thead><tr><th scope="col"><span class="sr">Need</span></th><th scope="col">Total India</th><th scope="col">Traditionalists</th><th scope="col">Content Moguls</th><th scope="col" class="focus-col">Couples</th><th scope="col">Parents</th></tr></thead>
+          <tbody>
+<tr><th scope="row">Clearly labeled family content</th><td class="hi" title="Total India: High importance"><span class="sr">High importance</span></td><td class="hi" title="Traditionalists: High importance"><span class="sr">High importance</span></td><td class="hi" title="Content Moguls: High importance"><span class="sr">High importance</span></td><td class="hi" title="Couples: High importance"><span class="sr">High importance</span></td><td class="hi" title="Parents: High importance"><span class="sr">High importance</span></td></tr>
+<tr><th scope="row">All content in one place</th><td class="hi" title="Total India: High importance"><span class="sr">High importance</span></td><td class="hi" title="Traditionalists: High importance"><span class="sr">High importance</span></td><td class="hi" title="Content Moguls: High importance"><span class="sr">High importance</span></td><td class="hi" title="Couples: High importance"><span class="sr">High importance</span></td><td class="hi" title="Parents: High importance"><span class="sr">High importance</span></td></tr>
+<tr><th scope="row">Switch quickly between devices</th><td class="hi" title="Total India: High importance"><span class="sr">High importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="hi" title="Content Moguls: High importance"><span class="sr">High importance</span></td><td class="hi" title="Couples: High importance"><span class="sr">High importance</span></td><td class="hi" title="Parents: High importance"><span class="sr">High importance</span></td></tr>
+<tr><th scope="row">Continue watching across services</th><td class="hi" title="Total India: High importance"><span class="sr">High importance</span></td><td class="hi" title="Traditionalists: High importance"><span class="sr">High importance</span></td><td class="hi" title="Content Moguls: High importance"><span class="sr">High importance</span></td><td class="hi" title="Couples: High importance"><span class="sr">High importance</span></td><td class="hi" title="Parents: High importance"><span class="sr">High importance</span></td></tr>
+<tr><th scope="row">Bundle subscriptions</th><td class="hi" title="Total India: High importance"><span class="sr">High importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="hi" title="Content Moguls: High importance"><span class="sr">High importance</span></td><td class="hi" title="Couples: High importance"><span class="sr">High importance</span></td><td class="hi" title="Parents: High importance"><span class="sr">High importance</span></td></tr>
+<tr><th scope="row">Create a watchlist across services</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Search across services</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Access live sports</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Access live news</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="hi" title="Traditionalists: High importance"><span class="sr">High importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr class="voice-row"><th scope="row">Use voice to search</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="hi focus" title="Couples: High importance"><span class="sr">High importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Secure personal profiles</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Content organized by language</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="hi" title="Traditionalists: High importance"><span class="sr">High importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Use a mobile app to find content</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Get personalized recommendations</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Content organized by theme</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="lo" title="Parents: Relatively lower importance"><span class="sr">Relatively lower importance</span></td></tr>
+<tr><th scope="row">Catch-up shows I missed after live</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Content organized by genre</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Couples: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Parents: Moderate importance"><span class="sr">Moderate importance</span></td></tr>
+<tr><th scope="row">Set kid profiles</th><td class="mid" title="Total India: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="lo" title="Couples: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="kids" title="Parents: Kids">Kids</td></tr>
+<tr><th scope="row">See what's on cable</th><td class="lo" title="Total India: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="mid" title="Traditionalists: Moderate importance"><span class="sr">Moderate importance</span></td><td class="lo" title="Content Moguls: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Couples: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Parents: Relatively lower importance"><span class="sr">Relatively lower importance</span></td></tr>
+<tr><th scope="row">Controls to limit my kids' TV watching</th><td class="lo" title="Total India: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Traditionalists: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="mid" title="Content Moguls: Moderate importance"><span class="sr">Moderate importance</span></td><td class="lo" title="Couples: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="kids" title="Parents: Kids">Kids</td></tr>
+<tr><th scope="row">Set reminders for live content</th><td class="lo" title="Total India: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Traditionalists: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Content Moguls: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Couples: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Parents: Relatively lower importance"><span class="sr">Relatively lower importance</span></td></tr>
+<tr><th scope="row">Do more with your TV</th><td class="lo" title="Total India: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Traditionalists: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Content Moguls: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Couples: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Parents: Relatively lower importance"><span class="sr">Relatively lower importance</span></td></tr>
+<tr><th scope="row">Rent the newest movies</th><td class="lo" title="Total India: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Traditionalists: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Content Moguls: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Couples: Relatively lower importance"><span class="sr">Relatively lower importance</span></td><td class="lo" title="Parents: Relatively lower importance"><span class="sr">Relatively lower importance</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="sg-legend"><span><i class="hi"></i>High importance</span><span><i class="mid"></i>Moderate</span><span><i class="lo"></i>Relatively lower</span></div>
+      </div>
+      <div class="rec indent"><span class="lab">Recommendation</span><p>Prompt “Try Google Assistant” within personal profiles, where a wrong result will not embarrass anyone.</p></div>
+      <div class="ev r3 indent">
+        <div class="win"><span class="big">+23%</span><p>increase in Google Assistant adoption after the personal-profile prompt shipped.</p></div>
+        <div class="shot tagged"><span class="pic-tag">Shipped</span><img src="/tv-in-india/img/try-assistant.webp" alt="A personal profile home screen showing a Try Google Assistant prompt card" width="1024" height="559" loading="lazy"></div>
+      </div>
+    </article>
+
+    <article class="impact" id="impact-language">
+      <div class="imp-head">
+        <div class="k">Language &amp; genre</div>
+        <div>
+          <h3>Localize content categories</h3>
+          <p class="sub">Local-language content was heavily consumed, and users found familiar cable-style language filters helpful.</p>
+          <button class="loc" type="button" data-focus="language"><i style="background:var(--marigold)"></i>Content organized by language <b>94</b></button>
+        </div>
+      </div>
+      <div class="ev indent">
+        <div class="bars" style="--lw:80px">
+          <span class="tag qual" style="justify-self:start">Diary</span>
+          <h3 class="bars-t">Strong Engagement with Local-Language Content</h3>
+          <h4>What language was the program in?</h4>
+          <div class="br hl"><span>Hindi</span><span class="b"><i style="width:100%"></i></span><span class="v">78</span></div>
+          <div class="br"><span>English</span><span class="b"><i style="width:53.6%"></i></span><span class="v">42</span></div>
+          <div class="br hl"><span>Tamil</span><span class="b"><i style="width:44.5%"></i></span><span class="v">35</span></div>
+          <div class="br hl"><span>Bangla</span><span class="b"><i style="width:30.9%"></i></span><span class="v">24</span></div>
+          <div class="br"><span>Other</span><span class="b"><i style="width:8.3%"></i></span><span class="v">6</span></div>
+          <div class="br"><span>Marathi</span><span class="b"><i style="width:3.8%"></i></span><span class="v">3</span></div>
+          <p class="src">Viewing sessions logged across all diaries.</p>
+        </div>
+        <figure><div class="tagged"><span class="pic-tag">Diary</span><img src="/tv-in-india/img/cable-home.webp" alt="A local cable home screen with tiles for channel groups such as Bangla, Hindi, English, Oriya, Bhojpuri, Kids and Regional" width="1000" height="750" loading="lazy" style="border-radius:8px"></div><figcaption>Local cable home screen grouped by language and genre. P04, M28, Content Mogul, Mumbai.</figcaption></figure>
+      </div>
+      <div class="ev wide indent">
+        <div class="bars genre">
+          <span class="tag qual" style="justify-self:start">Diary</span>
+          <h3 class="bars-t">Content Type + Language helpful</h3>
+          <h4>Top interest categories</h4>
+          <div class="br"><span>Talent search (Indian Idol, Dance India Dance)</span><span class="b"><i style="width:100%"></i></span><span class="v">19</span></div>
+          <div class="br"><span>Web series</span><span class="b"><i style="width:94.7%"></i></span><span class="v">18</span></div>
+          <div class="br hl"><span>Bollywood movies, Hindi</span><span class="b"><i style="width:89.5%"></i></span><span class="v">17</span></div>
+          <div class="br"><span>Children's programs</span><span class="b"><i style="width:84.2%"></i></span><span class="v">16</span></div>
+          <div class="br"><span>Reality shows</span><span class="b"><i style="width:78.9%"></i></span><span class="v">15</span></div>
+          <div class="br"><span>Family programs</span><span class="b"><i style="width:78.9%"></i></span><span class="v">15</span></div>
+          <div class="br"><span>English movies</span><span class="b"><i style="width:78.9%"></i></span><span class="v">15</span></div>
+          <div class="br hl"><span>Music &amp; music videos, Hindi</span><span class="b"><i style="width:73.7%"></i></span><span class="v">14</span></div>
+          <div class="br hl"><span>Movies, regional language</span><span class="b"><i style="width:68.4%"></i></span><span class="v">13</span></div>
+          <div class="br"><span>Comedy</span><span class="b"><i style="width:68.4%"></i></span><span class="v">13</span></div>
+          <div class="br hl"><span>Drama / serials, Hindi</span><span class="b"><i style="width:52.6%"></i></span><span class="v">10</span></div>
+          <p class="src">Viewing sessions logged across all diaries: dark blue bars represent local language + genre.</p>
+        </div>
+      </div>
+      <div class="maxd indent">
+        <div class="subgrp-h">
+          <span class="tag quant">Survey · n=1,000</span>
+          <h4>Importance of 23 needs (MaxDiff)</h4>
+          <p>Since language-only organization scored below average, it was nested under content types rather than prioritized on the home screen.</p>
+        </div>
+        <ol class="mx-list">
+<li class="mx mx-avg" aria-hidden="true"><span></span><span></span><span class="mx-b"><em>Average (100)</em></span><span></span></li>
+<li class="mx hi"><span class="mx-r">1</span><span class="mx-n">Clearly labeled family content</span><span class="mx-b"><i style="width:94.4%"></i></span><span class="mx-v">151</span></li>
+<li class="mx hi"><span class="mx-r">2</span><span class="mx-n">All content in one place</span><span class="mx-b"><i style="width:90.6%"></i></span><span class="mx-v">145</span></li>
+<li class="mx hi"><span class="mx-r">3</span><span class="mx-n">Switch quickly between devices</span><span class="mx-b"><i style="width:88.8%"></i></span><span class="mx-v">142</span></li>
+<li class="mx hi"><span class="mx-r">4</span><span class="mx-n">Continue watching across services</span><span class="mx-b"><i style="width:86.9%"></i></span><span class="mx-v">139</span></li>
+<li class="mx hi"><span class="mx-r">5</span><span class="mx-n">Bundle subscriptions</span><span class="mx-b"><i style="width:76.2%"></i></span><span class="mx-v">122</span></li>
+<li class="mx mid"><span class="mx-r">6</span><span class="mx-n">Create a watchlist across services</span><span class="mx-b"><i style="width:71.2%"></i></span><span class="mx-v">114</span></li>
+<li class="mx mid"><span class="mx-r">7</span><span class="mx-n">Search across services</span><span class="mx-b"><i style="width:68.8%"></i></span><span class="mx-v">110</span></li>
+<li class="mx mid"><span class="mx-r">8</span><span class="mx-n">Access live sports</span><span class="mx-b"><i style="width:68.8%"></i></span><span class="mx-v">110</span></li>
+<li class="mx mid"><span class="mx-r">9</span><span class="mx-n">Access live news</span><span class="mx-b"><i style="width:68.1%"></i></span><span class="mx-v">109</span></li>
+<li class="mx mid"><span class="mx-r">10</span><span class="mx-n">Use voice to search</span><span class="mx-b"><i style="width:67.5%"></i></span><span class="mx-v">108</span></li>
+<li class="mx mid"><span class="mx-r">11</span><span class="mx-n">Secure personal profiles</span><span class="mx-b"><i style="width:65.0%"></i></span><span class="mx-v">104</span></li>
+<li class="mx-split" aria-hidden="true"><span class="up">Above average ↑</span><span class="down">Below average ↓</span></li>
+<li class="mx mid focus"><span class="mx-r">12</span><span class="mx-n">Content organized by language</span><span class="mx-b"><i style="width:58.8%"></i></span><span class="mx-v">94</span></li>
+<li class="mx mid"><span class="mx-r">13</span><span class="mx-n">Use a mobile app to find content</span><span class="mx-b"><i style="width:58.8%"></i></span><span class="mx-v">94</span></li>
+<li class="mx mid"><span class="mx-r">14</span><span class="mx-n">Get personalized recommendations</span><span class="mx-b"><i style="width:57.5%"></i></span><span class="mx-v">92</span></li>
+<li class="mx mid"><span class="mx-r">15</span><span class="mx-n">Content organized by theme</span><span class="mx-b"><i style="width:51.9%"></i></span><span class="mx-v">83</span></li>
+<li class="mx mid"><span class="mx-r">16</span><span class="mx-n">Catch-up shows I missed after live</span><span class="mx-b"><i style="width:51.2%"></i></span><span class="mx-v">82</span></li>
+<li class="mx mid"><span class="mx-r">17</span><span class="mx-n">Content organized by genre</span><span class="mx-b"><i style="width:51.2%"></i></span><span class="mx-v">82</span></li>
+<li class="mx lo"><span class="mx-r">18</span><span class="mx-n">Set a kid profile</span><span class="mx-b"><i style="width:50.0%"></i></span><span class="mx-v">80</span></li>
+<li class="mx lo"><span class="mx-r">19</span><span class="mx-n">See what's on cable</span><span class="mx-b"><i style="width:47.5%"></i></span><span class="mx-v">76</span></li>
+<li class="mx lo"><span class="mx-r">20</span><span class="mx-n">Controls to limit my kids' TV watching</span><span class="mx-b"><i style="width:45.0%"></i></span><span class="mx-v">72</span></li>
+<li class="mx lo"><span class="mx-r">21</span><span class="mx-n">Set reminders for live content</span><span class="mx-b"><i style="width:44.4%"></i></span><span class="mx-v">71</span></li>
+<li class="mx lo"><span class="mx-r">22</span><span class="mx-n">Do more with your TV</span><span class="mx-b"><i style="width:39.4%"></i></span><span class="mx-v">63</span></li>
+<li class="mx lo"><span class="mx-r">23</span><span class="mx-n">Rent the newest movies</span><span class="mx-b"><i style="width:36.9%"></i></span><span class="mx-v">59</span></li>
+        </ol>
+        <p class="note">MaxDiff score: 100 = average need (dashed line); 120 or more = top tier.</p>
+      </div>
+      <div class="rec indent"><span class="lab">Recommendation</span><p>Add local language filters in “Shows” and “Movies”.</p></div>
+      <div class="ev three indent">
+        <figure class="considered"><div class="shot"><img src="/tv-in-india/img/lang-homepage.webp" alt="Option considered: a Programs in Hindi row on the home page" width="1024" height="535" loading="lazy"></div><figcaption><b>Considered:</b> language rows on the home page.</figcaption></figure>
+        <figure><div class="shot tagged"><span class="pic-tag">Shipped</span><img src="/tv-in-india/img/lang-genre.webp" alt="Shipped: a Shows in Hindi row inside the Shows tab" width="1024" height="535" loading="lazy"></div><figcaption><b>Shipped:</b> language rows within tabs, such as Shows in Hindi.</figcaption></figure>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="chapter" id="timeline">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="num">Timeline</div>
+      <div><h2>6 Weeks, 3 Methods</h2></div>
+    </div>
+    <div class="tl indent">
+      <div class="panel"><span class="tag qual" style="justify-self:start">Diary · N=24</span><h3>2 weeks</h3><div class="phase"><i></i><div>Design &amp; Fielding<span>1 week</span></div></div><div class="phase"><i></i><div>Synthesis &amp; Reporting<span>1 week</span></div></div></div>
+      <div class="panel"><span class="tag qual" style="justify-self:start">Interviews · N=12</span><h3>2 weeks</h3><div class="phase"><i></i><div>Design &amp; Fielding<span>1 week</span></div></div><div class="phase"><i></i><div>Synthesis &amp; Reporting<span>1 week</span></div></div></div>
+      <div class="panel"><span class="tag quant" style="justify-self:start">Survey · n=1,000</span><h3>2 weeks</h3><div class="phase"><i></i><div>Design &amp; Programming<span>3 days</span></div></div><div class="phase"><i></i><div>Fielding<span>2 days</span></div></div><div class="phase"><i></i><div>Synthesis &amp; Reporting<span>1 week</span></div></div></div>
+    </div>
+    <div class="faster indent">
+      <div class="faster-h"><h3>Running it again today</h3><b>Interviews only · N=8 · 3–4 days</b></div>
+      <div class="tl">
+        <div class="panel"><span class="tag qual" style="justify-self:start">Step 1 · Design + Fielding</span><h3>1 day</h3><div class="phase"><i></i><div>Study Design</div></div><div class="phase"><i></i><div>AI Moderation</div></div></div>
+        <div class="panel"><span class="tag qual" style="justify-self:start">Step 2 · Synthesis</span><h3>1 day</h3><div class="phase"><i></i><div>Human Grounding</div></div><div class="phase"><i></i><div>AI Extraction</div></div><div class="phase"><i></i><div>Guardrail Pattern Mining</div></div></div>
+        <div class="panel"><span class="tag qual" style="justify-self:start">Step 3 · Reporting</span><h3>1–2 days</h3><div class="phase"><i></i><div>Deck</div></div><div class="phase"><i></i><div>Queryable Study Notebooks</div></div><div class="phase"><i></i><div>Revised UI Mockup</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap"><span>TV in India · Smart UI concept evaluation · Yan Luo</span><span>Participant faces obscured.</span></div></footer>
+
+<script>
+(function(){
+  // MaxDiff scores (HB utilities rescaled, 100 = average), in rank order.
+  // q: quadrant from the prioritization map; null = not mapped.
+  const NEEDS = [
+    {id:"family",  s:151, n:"Browse clearly labeled family-friendly content", sh:"Family-labeled content", q:"TS", go:"impact-profiles"},
+    {id:"allinone",s:145, n:"Access all my content in one place", sh:"All-in-one", q:"TD", go:"impact-all-in-one"},
+    {id:"switch",  s:142, n:"Switch quickly between devices connected to the TV", sh:"Switch devices", q:"TS"},
+    {id:"continue",s:139, n:"Continue watching across streaming services", sh:"Continue watching", q:"TS", go:"impact-all-in-one"},
+    {id:"bundle",  s:122, n:"Consolidate subscriptions into one discounted payment", sh:"Bundle subscriptions", q:"TD", go:"impact-bundle"},
+    {id:"watchlist",s:114,n:"Create a single watchlist across services", sh:"Watchlist across services", q:"VA"},
+    {id:"search",  s:110, n:"Search across services", q:"MT", noplot:true},
+    {id:"sports",  s:110, n:"Access live sports", sh:"Live sports", q:"MT"},
+    {id:"news",    s:109, n:"Access live news", sh:"Live news", q:"MT"},
+    {id:"voice",   s:108, n:"Use voice to search", sh:"Voice search", q:"VA", go:"impact-assistant"},
+    {id:"secure",  s:104, n:"Secure personal profiles", sh:"Secure profiles", q:"VA", go:"impact-profiles"},
+    {id:"language",s:94,  n:"Content organized by language", sh:"Organized by language", q:"VA", go:"impact-language"},
+    {id:"mobile",  s:94,  n:"Use a mobile app to find content", sh:"Mobile app to find content", q:"MT"},
+    {id:"recs",    s:92,  n:"Get personalized recommendations", q:"MT", noplot:true},
+    {id:"theme",   s:83,  n:"Content organized by theme (award winners, trending)", q:"MT", noplot:true},
+    {id:"catchup", s:82,  n:"Catch up on shows I missed after they air live", q:"VA", noplot:true},
+    {id:"genre",   s:82,  n:"Content organized by genre", q:"MT", noplot:true},
+    {id:"kid",     s:80,  n:"Set a kid profile", q:"VA", noplot:true},
+    {id:"cable",   s:76,  n:"See what's on cable first", q:"MT", noplot:true},
+    {id:"limits",  s:72,  n:"Controls to limit my kids' TV watching", q:"VA", noplot:true},
+    {id:"remind",  s:71,  n:"Set reminders for live content", q:"VA", noplot:true},
+    {id:"more",    s:63,  n:"Do more with the TV, like video calls", q:"VA", noplot:true},
+    {id:"rent",    s:59,  n:"Rent the newest movies", q:"VA", noplot:true}
+  ];
+  NEEDS.forEach((d,i)=>d.rank=i+1);
+  const Q = {
+    TD:{name:"Top differentiator", desc:"Important, not well met", met:false},
+    TS:{name:"Table stakes", desc:"Important, already well met", met:true},
+    VA:{name:"Value adds", desc:"Less important, not well met", met:false},
+    MT:{name:"Maintain", desc:"Less important, already works", met:true}
+  };
+  const byId = Object.fromEntries(NEEDS.map(d=>[d.id,d]));
+  const SVGNS="http://www.w3.org/2000/svg";
+  const el=(t,a,p)=>{const e=document.createElementNS(SVGNS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+
+  // ---------- quadrant chart ----------
+  const W=760,H=520,M={l:56,r:12,t:20,b:44};
+  const pw=W-M.l-M.r, ph=H-M.t-M.b, Y0=76, Y1=165;
+  const y=v=>M.t+(Y1-v)/(Y1-Y0)*ph;
+  const colW=pw/2;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Scatter of 12 needs: MaxDiff importance on the vertical axis, well met or not on the horizontal"});
+  const g=el("g",{},svg);
+  // quadrant backgrounds
+  el("rect",{x:M.l,y:M.t,width:colW,height:y(120)-M.t,rx:10,fill:"var(--marigold-soft)"},g);
+  el("rect",{x:M.l+colW,y:M.t,width:colW,height:y(120)-M.t,rx:10,fill:"var(--mt-soft)"},g);
+  el("rect",{x:M.l,y:y(120),width:colW,height:M.t+ph-y(120),rx:10,fill:"var(--va-soft)"},g);
+  el("rect",{x:M.l+colW,y:y(120),width:colW,height:M.t+ph-y(120),rx:10,fill:"var(--shade)"},g);
+  
+  // y grid + ticks
+  [80,100,120,140,160].forEach(v=>{
+    const yy=y(v);
+    if(v!==120&&v!==100) el("line",{x1:M.l,x2:M.l+pw,y1:yy,y2:yy,stroke:"var(--line)","stroke-width":1},g);
+    const t=el("text",{x:M.l-10,y:yy+4,"text-anchor":"end","font-size":12,fill:"var(--muted)"},g); t.textContent=v;
+  });
+  el("line",{x1:M.l,x2:M.l+pw,y1:y(100),y2:y(100),stroke:"var(--muted)","stroke-width":1,"stroke-dasharray":"4 4"},g);
+  el("line",{x1:M.l,x2:M.l+pw,y1:y(120),y2:y(120),stroke:"var(--muted)","stroke-width":1},g);
+  el("line",{x1:M.l+colW,x2:M.l+colW,y1:M.t,y2:M.t+ph,stroke:"var(--muted)","stroke-width":1},g);
+  const lab=(x,yy,txt,o)=>{const t=el("text",Object.assign({x,y:yy,"font-size":11.5,"font-weight":500,fill:"var(--muted)"},o||{}),g);t.textContent=txt;return t};
+  lab(M.l+pw-6,y(120)-6,"Cut-off 120",{"text-anchor":"end"});
+  lab(M.l+pw-6,y(100)-6,"Average 100",{"text-anchor":"end"});
+  // axis titles
+  const yt=el("text",{transform:`translate(14 ${M.t+ph/2}) rotate(-90)`,"text-anchor":"middle","font-size":12.5,fill:"var(--ink-2)"},g); yt.textContent="Importance (MaxDiff score)";
+  const x1=el("text",{x:M.l+colW/2,y:H-14,"text-anchor":"middle","font-size":12.5,fill:"var(--ink-2)"},g); x1.textContent="Not well met";
+  const x2=el("text",{x:M.l+colW*1.5,y:H-14,"text-anchor":"middle","font-size":12.5,fill:"var(--ink-2)"},g); x2.textContent="Well met";
+  // quadrant titles
+  const qt=(x,yy,a,b,col)=>{const t=el("text",{x,y:yy,"font-size":15,"font-weight":600,fill:col||"var(--ink)","letter-spacing":"-0.01em"},g);t.textContent=a;const s=el("text",{x,y:yy+16,"font-size":11.5,fill:"var(--muted)"},g);s.textContent=b;};
+  qt(M.l+14,M.t+22,"Top differentiators","Important · not well met","var(--marigold-ink)");
+  qt(M.l+colW+14,M.t+22,"Table stakes","Important · well met","var(--mt-ink)");
+  qt(M.l+14,M.t+ph-28,"Value adds","Less important · not well met","var(--va-ink)");
+  qt(M.l+colW+14,M.t+ph-28,"Maintain","Less important · already works");
+
+  const pts=NEEDS.filter(d=>d.q && !d.noplot);
+  const layer=el("g",{},svg);
+  const nodes={};
+  [false,true].forEach(met=>{
+    const col=pts.filter(d=>Q[d.q].met===met).sort((a,b)=>b.s-a.s);
+    let lastLy=-99, prevS=999, prevShift=false;
+    col.forEach(d=>{
+      const close=prevS-d.s<3 && !prevShift; prevS=d.s; prevShift=close;
+      const cx=M.l+(met?colW:0)+colW*(close?.56:.1);
+      const cy=y(d.s);
+      let ly=close?cy:Math.max(cy, lastLy+17); if(!close) lastLy=ly;
+      d._x=cx; d._y=cy;
+      const color=met?"var(--indigo)":"var(--marigold)";
+      const gp=el("g",{class:"pt",tabindex:0,role:"button","data-id":d.id,"aria-label":`${d.n}: MaxDiff ${d.s}, rank ${d.rank} of 23, ${Q[d.q].name}`},layer);
+      if(Math.abs(ly-cy)>2) el("line",{x1:cx+7,y1:cy,x2:cx+12,y2:ly-4,stroke:"var(--muted)","stroke-width":1},gp);
+      el("circle",{cx,cy,r:18,fill:"transparent"},gp);
+      el("circle",{class:"ring",cx,cy,r:9,fill:"none",stroke:"transparent"},gp);
+      el("circle",{class:"dot",cx,cy,r:7,fill:color,stroke:"var(--surface)","stroke-width":2.5},gp);
+      const t=el("text",{x:cx+13,y:ly+4,"font-size":13,"font-weight":500,"letter-spacing":"-0.01em",fill:"var(--ink)"},gp); t.textContent=d.sh;
+      const v=el("text",{x:cx+13,y:ly+4,"font-size":11.5,"font-weight":500,fill:"var(--muted)"},gp);
+      d._t=t; d._v=v; nodes[d.id]=gp;
+    });
+  });
+  document.getElementById("quad").appendChild(svg);
+  // place score after label once fonts are measurable
+  const placeScores=()=>pts.forEach(d=>{const w=d._t.getComputedTextLength();d._v.setAttribute("x",+d._t.getAttribute("x")+w+6);d._v.textContent=d.s;});
+  placeScores(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(placeScores);
+
+  // ---------- ranked list ----------
+  const rk=document.getElementById("ranked");
+  const tiers=[["High importance · 120 or more",s=>s>=120],["Moderate · 81 to 119",s=>s>80&&s<120],["Relatively lower · 80 or below",s=>s<=80]];
+  const rows={};
+  tiers.forEach(([label,f])=>{
+    const h=document.createElement("div");h.className="tier";h.textContent=label;rk.appendChild(h);
+    NEEDS.filter(d=>f(d.s)).forEach(d=>{
+      const r=document.createElement("div");r.className="rk"+(d.s>=120?" hi":"");r.tabIndex=0;r.dataset.id=d.id;
+      r.setAttribute("role","button");r.setAttribute("aria-label",`${d.n}: MaxDiff ${d.s}, rank ${d.rank}`);
+      const qtag=d.q?`<span class="tag q-${d.q}">${Q[d.q].name}</span>`:"";
+      r.innerHTML=`<span class="r">${d.rank}</span><span class="nm">${d.n}${qtag}</span><span class="b"><i style="width:${(d.s/160*100).toFixed(1)}%"></i><u style="left:${(100/160*100).toFixed(1)}%"></u></span><span class="v">${d.s}</span>`;
+      rk.appendChild(r); rows[d.id]=r;
+    });
+  });
+
+  // ---------- tooltip ----------
+  const viz=document.getElementById("viz"), tip=document.getElementById("tip");
+  const narrow=()=>window.matchMedia("(max-width:640px)").matches;
+  let current=null, pinned=false;
+  function fill(d){
+    const q=d.q?Q[d.q]:null;
+    const col=q?(q.met?"var(--indigo)":"var(--marigold)"):"var(--bar)";
+    const ratio=(d.s/100).toFixed(2);
+    const tier=d.s>=120?"High importance":d.s>80?"Moderate importance":"Relatively lower importance";
+    tip.innerHTML=
+      `<span class="t-q" style="color:${q?(q.met?'var(--indigo)':'var(--marigold-ink)'):'var(--muted)'}">${q?q.name+" · "+q.desc:"Not mapped on the 2×2"}</span>`+
+      `<span class="t-n">${d.n}</span>`+
+      `<div class="t-row"><span class="t-big">${d.s}</span><span class="t-meta"><span>MaxDiff score · <b>rank ${d.rank}</b> of 23</span><span><b>${ratio}×</b> the average need · ${tier}</span></span></div>`+
+      `<div><div class="t-scale"><i style="width:${(d.s/160*100).toFixed(1)}%;background:${col}"></i><u style="left:${(100/160*100).toFixed(1)}%"></u><u style="left:${(120/160*100).toFixed(1)}%;background:var(--ink-2)"></u></div>`+
+      `<div class="t-axis" style="margin-top:5px"><span>0</span><span>Avg 100 · cut-off 120</span><span>160</span></div></div>`+
+      (d.go?`<span class="t-go">See what shipped ›</span>`:"");
+  }
+  let hideT=null;
+  function show(d,anchor){
+    clearTimeout(hideT); const wasOpen=!tip.hidden&&tip.classList.contains("in");
+    current=d; fill(d); tip.hidden=false;
+    Object.values(nodes).forEach(n=>n.classList.toggle("on",n.dataset.id===d.id));
+    Object.values(nodes).forEach(n=>n.classList.toggle("dim",n.dataset.id!==d.id));
+    Object.values(rows).forEach(n=>n.classList.toggle("on",n.dataset.id===d.id));
+    if(narrow()){tip.classList.add("static");tip.style.transformOrigin="50% 0";if(!wasOpen){void tip.offsetWidth;}tip.classList.add("in");return}
+    tip.classList.remove("static");
+    const vb=viz.getBoundingClientRect(), ab=anchor.getBoundingClientRect();
+    const tw=tip.offsetWidth, th=tip.offsetHeight;
+    let left=ab.right-vb.left+14, top=ab.top-vb.top+ab.height/2-th/2;
+    if(left+tw>vb.width-8) left=ab.left-vb.left-tw-14;
+    if(left<8) left=8;
+    top=Math.max(8,Math.min(top,vb.height-th-8));
+    tip.style.left=left+"px"; tip.style.top=top+"px";
+    // grow out of the dot that triggered it
+    const ox=(ab.left+ab.width/2-vb.left)-left, oy=(ab.top+ab.height/2-vb.top)-top;
+    tip.style.transformOrigin=`${ox}px ${oy}px`;
+    if(!wasOpen){ void tip.offsetWidth; }
+    tip.classList.add("in");
+  }
+  function hide(){ if(pinned) return; current=null; tip.classList.remove("in"); clearTimeout(hideT); hideT=setTimeout(()=>{ if(!current) tip.hidden=true; },220);
+    Object.values(nodes).forEach(n=>n.classList.remove("on","dim"));
+    Object.values(rows).forEach(n=>n.classList.remove("on")); }
+  function go(d){ if(d.go){ const t=document.getElementById(d.go); if(t) t.scrollIntoView({behavior:"smooth",block:"start"}); } }
+  function bind(node,d){
+    const anchor=node.querySelector?.(".dot")||node;
+    node.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse"){pinned=false;show(d,anchor)}});
+    node.addEventListener("pointerleave",e=>{if(e.pointerType==="mouse")hide()});
+    node.addEventListener("focus",()=>show(d,anchor));
+    node.addEventListener("blur",()=>{pinned=false;hide()});
+    // touch: respond on pointer-down, not on release; a second tap on the same need opens its story
+    let openOnDown=false;
+    node.addEventListener("pointerdown",e=>{
+      if(e.pointerType==="mouse") return;
+      openOnDown=!!(current&&current.id===d.id);
+      pinned=true; show(d,anchor);
+    });
+    node.addEventListener("click",e=>{
+      if(e.pointerType && e.pointerType!=="mouse"){ if(openOnDown) go(d); return; }
+      go(d);
+    });
+    node.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go(d)} if(e.key==="Escape"){pinned=false;hide();node.blur()}});
+  }
+  Object.values(nodes).forEach(n=>bind(n,byId[n.dataset.id]));
+  Object.values(rows).forEach(n=>bind(n,byId[n.dataset.id]));
+  document.addEventListener("pointerdown",e=>{ if(pinned && !e.target.closest(".pt,.rk")){pinned=false;hide()} });
+
+  // ---------- view toggle ----------
+  const bq=document.getElementById("btn-quad"), br=document.getElementById("btn-rank");
+  function setView(v){
+    const q=v==="quad"; bq.setAttribute("aria-pressed",q); br.setAttribute("aria-pressed",!q);
+    moveThumb();
+    document.getElementById("quad").hidden=!q; document.getElementById("ranked").hidden=q;
+    document.getElementById("quad-note").textContent=q
+      ?"Y-axis: MaxDiff importance score (100 = average, ≥120 = top tier). X-axis: Needs are grouped as “well-met” vs. “unmet”; horizontal spacing is jittered for readability. Switch to ranked view to see all 23 needs."
+      :"MaxDiff scores from hierarchical Bayes utilities, rescaled so the average need scores 100 (dashed line). Scores are ratios: a need scoring 142 is about twice as important as one scoring 71.";
+    document.getElementById("legend").style.visibility=q?"visible":"hidden";
+    pinned=false; hide();
+  }
+  const thumb=document.querySelector(".seg .thumb");
+  function moveThumb(){
+    const on=bq.getAttribute("aria-pressed")==="true"?bq:br;
+    thumb.style.width=on.offsetWidth+"px"; thumb.style.transform=`translateX(${on.offsetLeft}px)`;
+  }
+    bq.addEventListener("click",()=>setView("quad")); br.addEventListener("click",()=>setView("rank"));
+  moveThumb(); window.addEventListener("resize",moveThumb);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(moveThumb);
+
+  // ---------- nav edge: only once content scrolls underneath ----------
+  const nav=document.querySelector(".nav");
+  const edge=()=>nav.classList.toggle("scrolled",window.scrollY>4);
+  edge(); window.addEventListener("scroll",edge,{passive:true});
+
+  // ---------- chips in impact section ----------
+  document.querySelectorAll(".loc").forEach(b=>b.addEventListener("click",()=>{
+    const d=byId[b.dataset.focus]; setView("quad");
+    viz.scrollIntoView({behavior:"smooth",block:"center"});
+    setTimeout(()=>{pinned=true;show(d,nodes[d.id].querySelector(".dot"))},450);
+  }));
+})();
+</script>
+
+</body>
+</html>
