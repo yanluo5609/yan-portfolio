@@ -219,6 +219,14 @@ svg text{font-family:var(--sys)}
 .ev.three>figure:nth-child(3){grid-column:1 / -1;justify-self:center;width:calc(50% - .625rem)}
 @media (max-width:860px){.ev.three{grid-template-columns:minmax(0,1fr)}.ev.three>figure:nth-child(3){width:100%}}
 .ev.r3{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+/* Card + image rows: equal columns; the image frame matches the card's height, captions sit below on a shared row */
+.ev.pair{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto;row-gap:0}
+.ev.pair>:not(.mfig){grid-row:1}
+.ev.pair>.mfig{grid-row:1 / span 2;display:grid;grid-template-rows:subgrid;min-width:0}
+.media{position:relative;border-radius:1.25rem;overflow:hidden;background:#0E0E10;min-height:0}
+.ev .media img{display:block;width:100%;height:100%;aspect-ratio:16/9;object-fit:cover;border-radius:0}
+.media.contain{background:#fff}
+.ev .media.contain img{object-fit:contain;padding:2.75rem 1rem 1rem}
 blockquote{margin:0;padding:2rem;background:var(--surface);border-radius:1.5rem;display:grid;gap:1rem;align-content:center}
 blockquote p{font-size:1.75rem;line-height:1.18;font-weight:600;letter-spacing:-0.024em;color:var(--ink)}
 blockquote cite{font-style:normal;font-size:.875rem;color:var(--muted)}
@@ -343,6 +351,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
   section.chapter{padding-block:4.5rem}
   .sub-h{margin-top:3.5rem}
   .impact{padding-top:4rem}
+  .ev.pair{grid-template-columns:minmax(0,1fr);grid-template-rows:none;row-gap:1.25rem}
+  .ev.pair>:not(.mfig),.ev.pair>.mfig{grid-row:auto}
+  .ev.pair>.mfig{display:block}
+  .ev .media img{height:auto}
 }
 @media (max-width:640px){
   .viz{padding:1.25rem 1rem 1rem;border-radius:1.5rem}
@@ -369,9 +381,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
 }
 html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
 </style>
-</head>
-<body>
-
 
 <nav class="nav" aria-label="Sections">
   <div class="wrap">
@@ -588,13 +597,12 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <button class="loc" type="button" data-focus="bundle"><i style="background:var(--marigold)"></i>Bundle subscriptions <b>122</b></button>
         </div>
       </div>
-      <div class="ev r3 indent">
+      <div class="ev pair indent">
         <blockquote><p>"If everything gets accommodated in a single package with a discount, that's great."</p><cite>Survey respondent, on how the need could be improved</cite></blockquote>
-        <div class="shipped">
-          <span class="lab">Shipped</span>
-          <div class="shot" style="background:#fff"><img src="/tv-in-india/img/bundle.webp" alt="Tata Sky Binge+ Android TV set-top box offer bundling several streaming apps and Amazon Prime Video for one price" width="1400" height="328" loading="lazy"></div>
+        <figure class="mfig">
+          <div class="media contain tagged"><span class="pic-tag">Shipped</span><img src="/tv-in-india/img/bundle.webp" alt="Tata Sky Binge+ Android TV set-top box offer bundling several streaming apps and Amazon Prime Video for one price" width="1400" height="328" loading="lazy"></div>
           <figcaption>The research shaped a bundled service offered through Tata Sky Binge+ on Android TV.</figcaption>
-        </div>
+        </figure>
       </div>
     </article>
 
@@ -608,12 +616,12 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <button class="loc" type="button" data-focus="secure"><i style="background:var(--marigold)"></i>Secure personal profiles <b>104</b></button>
         </div>
       </div>
-      <div class="ev indent">
+      <div class="ev pair indent">
         <blockquote><p>"If some adult scene comes up during family watching, it is so embarrassing."</p><cite>P19, M32, Traditionalist, Coimbatore</cite></blockquote>
-        <figure><div class="tagged"><span class="pic-tag">Diary</span><img src="/tv-in-india/img/family-viewing.webp" alt="Diary photo of a family watching TV together in their living room, faces obscured" width="1002" height="524" loading="lazy" style="border-radius:8px"></div><figcaption>Family viewing time with a child, from P19's diary.</figcaption></figure>
+        <figure class="mfig"><div class="media tagged"><span class="pic-tag">Diary</span><img src="/tv-in-india/img/family-viewing.webp" alt="Diary photo of a family watching TV together in their living room, faces obscured" width="1002" height="524" loading="lazy"></div><figcaption>Family viewing time with a child, from P19's diary.</figcaption></figure>
       </div>
       <div class="rec indent"><span class="lab">Recommendation</span><p>Add a lock to personal profiles on the TV, and make the family profile the default.</p></div>
-      <div class="ev r3 indent">
+      <div class="ev pair indent">
         <div class="panel changes">
           <span class="tag qual" style="justify-self:start">Shipped</span>
           <h3>Profile Lock</h3>
@@ -621,7 +629,7 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <h3>Default to Family Profile</h3>
           <ul class="list"><li>Instead of “last active” profile</li></ul>
         </div>
-        <div class="shot"><img src="/tv-in-india/img/profile-lock.webp" alt="Profile lock dialog asking for a four-digit PIN over the smart TV home screen" width="1024" height="577" loading="lazy"></div>
+        <figure class="mfig"><div class="media"><img src="/tv-in-india/img/profile-lock.webp" alt="Profile lock dialog asking for a four-digit PIN over the smart TV home screen" width="1024" height="577" loading="lazy"></div></figure>
       </div>
       <div class="ev indent">
         <figure><div class="tagged"><img src="/tv-in-india/img/personal-profile.webp" alt="Illustration of a couple watching TV late in the evening on a personal profile home screen" width="1024" height="559" loading="lazy"><span class="when night">Sat night</span></div><figcaption><b>Personal profile</b> for solo viewing or co-viewing with a partner. AI-generated illustration.</figcaption></figure>
@@ -692,9 +700,9 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
         <div class="sg-legend"><span><i class="hi"></i>High importance</span><span><i class="mid"></i>Moderate</span><span><i class="lo"></i>Relatively lower</span></div>
       </div>
       <div class="rec indent"><span class="lab">Recommendation</span><p>Prompt “Try Google Assistant” within personal profiles, where a wrong result will not embarrass anyone.</p></div>
-      <div class="ev r3 indent">
+      <div class="ev pair indent">
         <div class="win"><span class="big">+23%</span><p>increase in Google Assistant adoption after the personal-profile prompt shipped.</p></div>
-        <div class="shot tagged"><span class="pic-tag">Shipped</span><img src="/tv-in-india/img/try-assistant.webp" alt="A personal profile home screen showing a Try Google Assistant prompt card" width="1024" height="559" loading="lazy"></div>
+        <figure class="mfig"><div class="media tagged"><span class="pic-tag">Shipped</span><img src="/tv-in-india/img/try-assistant.webp" alt="A personal profile home screen showing a Try Google Assistant prompt card" width="1024" height="559" loading="lazy"></div></figure>
       </div>
     </article>
 
@@ -707,7 +715,7 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <button class="loc" type="button" data-focus="language"><i style="background:var(--marigold)"></i>Content organized by language <b>94</b></button>
         </div>
       </div>
-      <div class="ev indent">
+      <div class="ev pair indent">
         <div class="bars" style="--lw:80px">
           <span class="tag qual" style="justify-self:start">Diary</span>
           <h3 class="bars-t">Strong Engagement with Local-Language Content</h3>
@@ -720,7 +728,7 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <div class="br"><span>Marathi</span><span class="b"><i style="width:3.8%"></i></span><span class="v">3</span></div>
           <p class="src">Viewing sessions logged across all diaries.</p>
         </div>
-        <figure><div class="tagged"><span class="pic-tag">Diary</span><img src="/tv-in-india/img/cable-home.webp" alt="A local cable home screen with tiles for channel groups such as Bangla, Hindi, English, Oriya, Bhojpuri, Kids and Regional" width="1000" height="750" loading="lazy" style="border-radius:8px"></div><figcaption>Local cable home screen grouped by language and genre. P04, M28, Content Mogul, Mumbai.</figcaption></figure>
+        <figure class="mfig"><div class="media tagged"><span class="pic-tag">Diary</span><img src="/tv-in-india/img/cable-home.webp" alt="A local cable home screen with tiles for channel groups such as Bangla, Hindi, English, Oriya, Bhojpuri, Kids and Regional" width="1000" height="750" loading="lazy"></div><figcaption>Local cable home screen grouped by language and genre. P04, M28, Content Mogul, Mumbai.</figcaption></figure>
       </div>
       <div class="ev wide indent">
         <div class="bars genre">
@@ -1029,6 +1037,4 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
   }));
 })();
 </script>
-
-</body>
 </html>
