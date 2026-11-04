@@ -381,8 +381,69 @@ footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;
   .tip,.panel,.step,.axis,.qf,.viz,.fact,.t5,.bars,blockquote,.win,.faster{outline:1px solid var(--ink-2)}
 }
 html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
+/* Impact map: a clickable 2x2 that mirrors the chart's quadrants and jumps to each impact thread */
+.imap{background:var(--surface);border-radius:1.75rem;padding:1.5rem}
+.imap-x{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;margin:0 0 .6rem;font-size:.8125rem;font-weight:600;padding-inline:.35rem}
+.imap-x span:first-child{color:var(--marigold-ink)}
+.imap-x span:last-child{color:var(--indigo)}
+.imap-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+.iq{border-radius:1.25rem;padding:1.15rem;display:grid;gap:.5rem;align-content:start}
+.iq.td{background:var(--marigold-soft)} .iq.ts{background:var(--mt-soft)} .iq.va{background:var(--va-soft)} .iq.mt{background:var(--shade)}
+.iq-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:.15rem .6rem;margin-bottom:.15rem}
+.iq-h b{font-size:1.0625rem;font-weight:700;letter-spacing:-0.015em}
+.iq.td .iq-h b{color:var(--marigold-ink)} .iq.ts .iq-h b{color:var(--mt-ink)} .iq.va .iq-h b{color:var(--va-ink)} .iq.mt .iq-h b{color:var(--ink-2)}
+.iq-h span{font-size:.8125rem;color:var(--muted)}
+.iq-a{display:grid;grid-template-columns:.6rem minmax(0,1fr) auto;align-items:center;gap:.7rem;background:var(--surface);border-radius:.9rem;padding:.65rem .85rem;text-decoration:none;color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / 6%);transition:transform .25s var(--spring)}
+.iq-a i{width:.6rem;height:.6rem;border-radius:50%}
+.iq-a .nm{display:grid;gap:.05rem;font-size:.9375rem;font-weight:600;letter-spacing:-0.012em;line-height:1.3}
+.iq-a small{font-size:.8125rem;font-weight:500;color:var(--indigo);letter-spacing:-0.006em}
+.iq-a b{font-size:.875rem;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.iq-a:active{transform:scale(.98)}
+@media (hover:hover) and (pointer:fine){.iq-a:hover small{text-decoration:underline}}
+.iq p{font-size:.875rem;color:var(--ink-2);line-height:1.45}
+.impact:target .imp-head h3{animation:landed 1.8s ease}
+/* GSAP motion helpers: hero stays hidden only until its entrance timeline is built (class removed by script) */
+html.gs .hero .wrap{visibility:hidden}
+.ln-mask{padding-bottom:.12em;margin-bottom:-.12em}
+
+/* Floating quadrant button: appears only while the Impact chapter is on screen; opens the clickable map */
+.qfab{position:fixed;z-index:6;right:max(1rem,env(safe-area-inset-right,0px));bottom:max(1rem,env(safe-area-inset-bottom,0px));display:inline-flex;align-items:center;gap:.55rem;padding:.7rem 1.05rem .7rem .8rem;border:0;border-radius:999px;font:600 .875rem/1 var(--sys);letter-spacing:-0.01em;color:var(--ink);background:var(--material);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 0 0 .5px var(--line),0 8px 24px rgb(0 0 0 / 14%);cursor:pointer;opacity:0;visibility:hidden;transform:translateY(.75rem) scale(.96);transition:opacity .25s ease,transform .45s var(--spring),visibility 0s linear .45s}
+.qfab.show{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .45s var(--spring),visibility 0s}
+.qfab.show:active{transform:scale(.96)}
+.qfab svg{display:block}
+.qfab[aria-expanded="true"]{background:var(--surface)}
+.imap.pop{position:fixed;z-index:7;right:max(1rem,env(safe-area-inset-right,0px));bottom:calc(max(1rem,env(safe-area-inset-bottom,0px)) + 3.75rem);width:min(38rem,calc(100vw - 2rem));max-height:calc(100dvh - 9rem);overflow:auto;overscroll-behavior:contain;margin:0;padding:1.25rem;border-radius:1.5rem;box-shadow:0 0 0 .5px var(--line),0 18px 50px rgb(0 0 0 / 22%);transform-origin:calc(100% - 3rem) 100%;opacity:0;transform:scale(.9);filter:blur(6px);visibility:hidden;transition:opacity .18s ease,transform .3s var(--spring),filter .18s ease,visibility 0s linear .3s}
+.imap.pop.open{opacity:1;transform:none;filter:none;visibility:visible;transition:opacity .2s ease,transform .45s var(--spring),filter .2s ease,visibility 0s}
+.imap-top{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.25rem 1rem;margin-bottom:.85rem}
+.imap-top b{font-size:1.0625rem;font-weight:700;letter-spacing:-0.015em}
+.imap-top span{font-size:.8125rem;color:var(--muted)}
+.iq-a.cur{box-shadow:inset 0 0 0 2px var(--indigo)}
+/* Mini 2x2 in each impact thread */
+.imp-head{grid-template-columns:minmax(0,1fr) 17.5rem;column-gap:3rem;max-width:none}
+.imp-head>.k,.imp-head>div:not(.k){grid-column:1}
+.imp-head>.mq{grid-column:2;grid-row:1 / span 2;align-self:start}
+.mq{margin:0;background:var(--surface);border-radius:1.25rem;padding:.8rem .8rem .55rem}
+.mq{position:relative;transition:box-shadow .25s ease,transform .35s var(--spring)}
+.mq figcaption{margin:0 0 .35rem .2rem;font-size:.75rem;font-weight:600;color:var(--muted);letter-spacing:0;display:flex;justify-content:space-between;gap:.5rem}
+.mq-cta{color:var(--indigo);font-weight:500}
+.mq-go{display:block;border-radius:inherit}
+.mq-go::after{content:"";position:absolute;inset:0;border-radius:1.25rem}
+.mq-go:focus-visible{outline:none}
+.mq:has(.mq-go:focus-visible){outline:2px solid var(--indigo);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){.mq:hover{box-shadow:0 6px 20px rgb(0 0 0 / 8%)}.mq:hover .mq-cta{text-decoration:underline}}
+.mq:active{transform:scale(.985)}
+.mq svg{display:block;width:100%;height:auto;overflow:visible}
+@media (max-width:860px){.imp-head{grid-template-columns:minmax(0,1fr)}.imp-head>.mq{grid-column:1;grid-row:auto;max-width:22rem;margin-top:.75rem}}
+@media (prefers-reduced-motion:reduce){.qfab,.imap.pop{transition:none!important;filter:none!important}.qfab.show:active{transform:none}}
+@media (prefers-reduced-transparency:reduce){.qfab{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+@keyframes landed{0%,35%{color:var(--indigo)}100%{color:var(--ink)}}
+@media (max-width:640px){.imap{padding:1rem;border-radius:1.5rem}.imap-x{display:none}.imap-grid{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.iq-a{transition:none}.iq-a:active{transform:none}.impact:target .imp-head h3{animation:none}}
+
 </style>
 
+<script>try{if(matchMedia("(prefers-reduced-motion: no-preference)").matches)document.documentElement.classList.add("gs")}catch(e){}</script>
 <nav class="nav" aria-label="Sections">
   <div class="wrap">
     <b>TV in India</b>
@@ -566,11 +627,11 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
       <div class="num">Impact</div>
       <div>
         <h2>From findings to shipped changes</h2>
-        <div class="prose"><p>Five threads, each tied back to where it sits on the prioritization map. Select a chip to see that need on the chart.</p></div>
+        <div class="prose"><p>Five threads, each tied back to where its need sits on the prioritization map. Each thread shows its need on a small 2×2. Use the Quadrants button at the bottom right to jump between threads, or select a chip to see a need on the full chart.</p></div>
       </div>
     </div>
 
-    <article class="impact" id="impact-all-in-one">
+        <article class="impact" id="impact-all-in-one">
       <div class="imp-head">
         <div class="k">Top differentiator</div>
         <div>
@@ -579,6 +640,7 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <button class="loc" type="button" data-focus="allinone"><i style="background:var(--marigold)"></i>All content in one place <b>145</b></button>
           <button class="loc" type="button" data-focus="continue"><i style="background:var(--indigo)"></i>Continue watching <b>139</b></button>
         </div>
+        <figure class="mq" data-need="allinone,continue"><figcaption><span>On the 2×2</span><span class="mq-cta">View full chart ›</span></figcaption></figure>
       </div>
       <div class="ev wide indent">
         <div class="shipped">
@@ -596,6 +658,7 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <p class="sub">The most unmet need in the study: 26% said "I can't do this". It was about more than saving money. Viewers wanted the convenience of a single payment.</p>
           <button class="loc" type="button" data-focus="bundle"><i style="background:var(--marigold)"></i>Bundle subscriptions <b>122</b></button>
         </div>
+        <figure class="mq" data-need="bundle"><figcaption><span>On the 2×2</span><span class="mq-cta">View full chart ›</span></figcaption></figure>
       </div>
       <div class="ev pair indent">
         <blockquote><p>"If everything gets accommodated in a single package with a discount, that's great."</p><cite>Survey respondent, on how the need could be improved</cite></blockquote>
@@ -615,6 +678,7 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <button class="loc" type="button" data-focus="family"><i style="background:var(--indigo)"></i>Family-labeled content <b>151</b></button>
           <button class="loc" type="button" data-focus="secure"><i style="background:var(--marigold)"></i>Secure personal profiles <b>104</b></button>
         </div>
+        <figure class="mq" data-need="family,secure"><figcaption><span>On the 2×2</span><span class="mq-cta">View full chart ›</span></figcaption></figure>
       </div>
       <div class="ev pair indent">
         <blockquote><p>"If some adult scene comes up during family watching, it is so embarrassing."</p><cite>P19, M32, Traditionalist, Coimbatore</cite></blockquote>
@@ -645,6 +709,7 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <p class="sub">Despite heavy phone usage, voice search stalled on TVs due to poor accent recognition and inaccurate results—creating fear of surfacing inappropriate content during shared family co-viewing.</p>
           <button class="loc" type="button" data-focus="voice"><i style="background:var(--marigold)"></i>Use voice to search <b>108</b></button>
         </div>
+        <figure class="mq" data-need="voice"><figcaption><span>On the 2×2</span><span class="mq-cta">View full chart ›</span></figcaption></figure>
       </div>
       <div class="ev indent">
         <div class="bars" style="--lw:150px">
@@ -714,6 +779,7 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
           <p class="sub">Local-language content was heavily consumed, and users found familiar cable-style language filters helpful.</p>
           <button class="loc" type="button" data-focus="language"><i style="background:var(--marigold)"></i>Content organized by language <b>94</b></button>
         </div>
+        <figure class="mq" data-need="language"><figcaption><span>On the 2×2</span><span class="mq-cta">View full chart ›</span></figcaption></figure>
       </div>
       <div class="ev pair indent">
         <div class="bars" style="--lw:80px">
@@ -816,8 +882,35 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
 </section>
 </main>
 
+<div class="imap pop" id="impact-map" role="dialog" aria-label="Impact map">
+      <div class="imap-top"><b>Impact map</b><span>Select a need to jump to its thread</span></div>
+      <div class="imap-x" aria-hidden="true"><span>Not well met</span><span>Well met</span></div>
+      <div class="imap-grid">
+        <div class="iq td"><div class="iq-h"><b>Top differentiator</b><span>Important, not well met</span></div>
+          <a class="iq-a" href="#impact-all-in-one"><i style="background:var(--marigold)"></i><span class="nm">All content in one place<small>→ Deepen “all-in-one”</small></span><b>145</b></a>
+          <a class="iq-a" href="#impact-bundle"><i style="background:var(--marigold)"></i><span class="nm">Bundle subscriptions<small>→ Bundle into one payment</small></span><b>122</b></a>
+        </div>
+        <div class="iq ts"><div class="iq-h"><b>Table stakes</b><span>Important, already well met</span></div>
+          <a class="iq-a" href="#impact-profiles"><i style="background:var(--indigo)"></i><span class="nm">Family-labeled content<small>→ Localize profiles</small></span><b>151</b></a>
+          <a class="iq-a" href="#impact-all-in-one"><i style="background:var(--indigo)"></i><span class="nm">Continue watching<small>→ Deepen “all-in-one”</small></span><b>139</b></a>
+        </div>
+        <div class="iq va"><div class="iq-h"><b>Value adds</b><span>Less important, not well met</span></div>
+          <a class="iq-a" href="#impact-assistant"><i style="background:var(--marigold)"></i><span class="nm">Use voice to search<small>→ Localize Google Assistant</small></span><b>108</b></a>
+          <a class="iq-a" href="#impact-profiles"><i style="background:var(--marigold)"></i><span class="nm">Secure personal profiles<small>→ Localize profiles</small></span><b>104</b></a>
+          <a class="iq-a" href="#impact-language"><i style="background:var(--marigold)"></i><span class="nm">Content organized by language<small>→ Localize content categories</small></span><b>94</b></a>
+        </div>
+        <div class="iq mt"><div class="iq-h"><b>Maintain</b><span>Less important, already works</span></div>
+          <p>Live sports, live news and the other needs here already work. No new work, just keep them working.</p>
+        </div>
+      </div>
+    </div>
+<button class="qfab" id="qfab" type="button" aria-expanded="false" aria-controls="impact-map" aria-label="Open the impact map"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><rect x="1" y="1" width="8" height="8" rx="2.2" fill="var(--marigold)"/><rect x="11" y="1" width="8" height="8" rx="2.2" fill="var(--mt-ink)"/><rect x="1" y="11" width="8" height="8" rx="2.2" fill="var(--va-ink)"/><rect x="11" y="11" width="8" height="8" rx="2.2" fill="var(--muted)" opacity=".55"/></svg><span>Quadrants</span></button>
+
 <footer><div class="wrap"><span>TV in India · Smart UI concept evaluation · Yan Luo</span><span>Participant faces obscured.</span></div></footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
 <script>
 (function(){
   // MaxDiff scores (HB utilities rescaled, 100 = average), in rank order.
@@ -1029,12 +1122,138 @@ html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
   const edge=()=>nav.classList.toggle("scrolled",window.scrollY>4);
   edge(); window.addEventListener("scroll",edge,{passive:true});
 
+  // ---------- mini 2x2 in each impact thread ----------
+  const MINI={allinone:"All-in-one",continue:"Continue watching",bundle:"Bundle subscriptions",family:"Family-labeled",secure:"Secure profiles",voice:"Voice search",language:"By language"};
+  document.querySelectorAll(".mq").forEach(box=>{
+    const ids=box.dataset.need.split(","), hq=new Set(ids.map(i=>byId[i].q));
+    const w=280,h=196,m={l:32,r:4,t:4,b:20}, mw=w-m.l-m.r, mh=h-m.t-m.b, cw=mw/2;
+    const mx=v=>m.l+(v-M.l)/pw*mw, my=v=>m.t+(v-M.t)/ph*mh, cut=my(y(120));
+    const s=el("svg",{viewBox:`0 0 ${w} ${h}`,"aria-hidden":"true"});
+    const quads=[["TD",m.l,m.t,cut-m.t,"--marigold-soft","--marigold-ink","Top differentiators"],["TS",m.l+cw,m.t,cut-m.t,"--mt-soft","--mt-ink","Table stakes"],["VA",m.l,cut,m.t+mh-cut,"--va-soft","--va-ink","Value adds"],["MT",m.l+cw,cut,m.t+mh-cut,"--shade","--muted","Maintain"]];
+    quads.forEach(([q,x,yy,hh,f,ink,name])=>{
+      const on=hq.has(q);
+      el("rect",{x:x+1.5,y:yy+1.5,width:cw-3,height:hh-3,rx:7,fill:`var(${f})`,opacity:on?1:.5},s);
+      const top=q==="TD"||q==="TS";
+      const t=el("text",{x:x+8,y:top?yy+15:yy+hh-8,"font-size":9.5,"font-weight":on?700:500,fill:on?`var(${ink})`:"var(--muted)","letter-spacing":"-0.01em"},s); t.textContent=name;
+    });
+    // y axis: importance (MaxDiff score)
+    [80,100,120,140,160].forEach(v=>{ const yy=my(y(v)); const t=el("text",{x:m.l-5,y:yy+3,"text-anchor":"end","font-size":9,fill:"var(--muted)","font-variant-numeric":"tabular-nums"},s); t.textContent=v; });
+    el("line",{x1:m.l+2,x2:m.l+mw-2,y1:my(y(100)),y2:my(y(100)),stroke:"var(--muted)","stroke-width":.75,"stroke-dasharray":"3 3",opacity:.7},s);
+    const ya=el("text",{transform:`translate(7 ${m.t+mh/2}) rotate(-90)`,"text-anchor":"middle","font-size":9.5,"font-weight":500,fill:"var(--ink-2)"},s); ya.textContent="Importance";
+    pts.forEach(d=>{ if(!ids.includes(d.id)) el("circle",{class:"mq-dot",cx:mx(d._x),cy:my(d._y),r:2.6,fill:"var(--bar)"},s); });
+    ids.forEach(id=>{
+      const d=byId[id], cx=mx(d._x), cy=my(d._y), col=Q[d.q].met?"var(--indigo)":"var(--marigold)";
+      el("circle",{class:"mq-halo",cx,cy,r:9.5,fill:col,opacity:.18},s);
+      el("circle",{class:"mq-hot",cx,cy,r:5.5,fill:col,stroke:"var(--surface)","stroke-width":2},s);
+      const label=MINI[id]||d.sh, right=true;
+      const t=el("text",{class:"mq-lab",x:right?cx+11:cx-11,y:cy+4,"text-anchor":right?"start":"end","font-size":11,"font-weight":600,fill:"var(--ink)","letter-spacing":"-0.01em"},s);
+      t.textContent=label+" ";
+      const v=el("tspan",{"font-weight":500,fill:"var(--muted)"},t); v.textContent=d.s;
+    });
+    [["Not well met",m.l+cw/2],["Well met",m.l+cw*1.5]].forEach(([txt,x])=>{const t=el("text",{x,y:h-5,"text-anchor":"middle","font-size":9.5,fill:"var(--muted)"},s);t.textContent=txt;});
+    // the whole card links back to the full chart in Key findings, with this thread's need selected
+    const go=document.createElement("a"); go.className="mq-go"; go.href="#viz";
+    go.setAttribute("aria-label",`See ${ids.map(i=>byId[i].n).join(" and ")} on the full importance by well-met chart (${ids.map(i=>`${Q[byId[i].q].name}, score ${byId[i].s}`).join("; ")})`);
+    go.appendChild(s); box.appendChild(go);
+    // keep each label inside its quadrant: if it would run off the right edge, set it under the dot, right-aligned
+    s.querySelectorAll(".mq-lab").forEach(t=>{ try{ const bb=t.getBBox(); if(bb.x+bb.width>w-2){ t.setAttribute("x",w-8); t.setAttribute("y",+t.getAttribute("y")+15); t.setAttribute("text-anchor","end"); } }catch(e){} });
+    go.addEventListener("click",e=>{ e.preventDefault(); const d=byId[ids[0]]; setView("quad");
+      viz.scrollIntoView({behavior:"smooth",block:"center"});
+      setTimeout(()=>{pinned=true;show(d,nodes[d.id].querySelector(".dot"))},450); });
+  });
+
+  // ---------- floating quadrant map: only while reading Impact ----------
+  const fab=document.getElementById("qfab"), map=document.getElementById("impact-map"), impactSec=document.getElementById("impact");
+  const isOpen=()=>map.classList.contains("open");
+  function setMap(open){
+    map.classList.toggle("open",open); fab.setAttribute("aria-expanded",open);
+    fab.setAttribute("aria-label",open?"Close the impact map":"Open the impact map");
+    if(open){ const f=map.querySelector(".iq-a.cur")||map.querySelector(".iq-a"); setTimeout(()=>f&&f.focus({preventScroll:true}),60); }
+  }
+  fab.addEventListener("click",()=>setMap(!isOpen()));
+  map.querySelectorAll(".iq-a").forEach(a=>a.addEventListener("click",()=>setMap(false)));
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&isOpen()){ setMap(false); fab.focus(); } });
+  document.addEventListener("pointerdown",e=>{ if(isOpen()&&!e.target.closest("#impact-map,#qfab")) setMap(false); });
+  const arts=[...document.querySelectorAll("article.impact")];
+  let curId;
+  function track(){
+    const r=impactSec.getBoundingClientRect(), vh=innerHeight, v=r.top<vh*.6&&r.bottom>vh*.5;
+    fab.classList.toggle("show",v); if(!v&&isOpen()) setMap(false);
+    let c=null; arts.forEach(a=>{ if(a.getBoundingClientRect().top<vh*.45) c=a.id; });
+    if(c!==curId){ curId=c; map.querySelectorAll(".iq-a").forEach(a=>{ const on=a.getAttribute("href")==="#"+c; a.classList.toggle("cur",on); if(on) a.setAttribute("aria-current","location"); else a.removeAttribute("aria-current"); }); }
+  }
+  track(); addEventListener("scroll",track,{passive:true}); addEventListener("resize",track);
+
   // ---------- chips in impact section ----------
   document.querySelectorAll(".loc").forEach(b=>b.addEventListener("click",()=>{
     const d=byId[b.dataset.focus]; setView("quad");
     viz.scrollIntoView({behavior:"smooth",block:"center"});
     setTimeout(()=>{pinned=true;show(d,nodes[d.id].querySelector(".dot"))},450);
   }));
+
+  // ---------- motion (GSAP + ScrollTrigger + SplitText); skipped entirely for reduced motion ----------
+  if(window.gsap && window.ScrollTrigger){
+    gsap.registerPlugin(ScrollTrigger); const hasSplit=!!window.SplitText; if(hasSplit) gsap.registerPlugin(SplitText);
+    gsap.defaults({ease:"power3.out",duration:.8});
+    const mm=gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)",()=>{
+      const fmt=v=>Math.round(v).toLocaleString("en-US");
+      const counters=[];
+      // Hero: eyebrow, title by character, then lede, photo and the four study numbers counting up
+      const hero=gsap.timeline({delay:.1});
+      hero.from(".hero .eyebrow",{autoAlpha:0,y:12,duration:.6});
+      if(hasSplit){ const st=SplitText.create(".hero h1",{type:"words,chars",mask:"words"}); hero.from(st.chars,{yPercent:110,stagger:.04,duration:1,ease:"power4.out"},"<0.1"); }
+      else hero.from(".hero h1",{autoAlpha:0,y:20},"<0.1");
+      hero.from([".hero .lede",".hero .byline"],{autoAlpha:0,y:16,stagger:.1},"-=0.6")
+          .from(".hero figure",{autoAlpha:0,y:24,duration:1},"<")
+          .from(".hero figure img",{scale:1.04,duration:1.6,ease:"power2.out"},"<")
+          .addLabel("facts","-=1.1")
+          .from(".fact",{autoAlpha:0,y:24,stagger:.08,clearProps:"transform"},"facts");
+      document.querySelectorAll(".fact .n").forEach((n,i)=>{
+        const txt=n.textContent, end=parseFloat(txt.replace(/,/g,"")), o={v:0}; counters.push([n,txt]); n.textContent="0";
+        hero.to(o,{v:end,duration:1.3,ease:"power2.out",onUpdate:()=>{n.textContent=fmt(o.v)}},`facts+=${i*.08}`);
+      });
+      // Chapter and thread headings rise line by line out of a mask
+      if(hasSplit) document.querySelectorAll(".sec-head h2, .imp-head h3").forEach(h=>{
+        SplitText.create(h,{type:"lines",mask:"lines",linesClass:"ln",autoSplit:true,
+          onSplit:self=>gsap.from(self.lines,{yPercent:105,stagger:.08,duration:1,ease:"power4.out",scrollTrigger:{trigger:h,start:"top 90%",once:true}})});
+      });
+      // Tiles fade up in small batches as they enter
+      const sel=".sec-head .prose, .two > *, .cities > *, .panel, .step, .qf, .t5, .viz, .bars, .maxd, .subgrp, .rec, .ev blockquote, .win, .ev figure, .ev .shipped, .ev > .shot, .imp-head .mq, .faster-h";
+      let els=[...document.querySelectorAll(sel)].filter(e=>!e.closest(".hero"));
+      els=els.filter(e=>!els.some(o=>o!==e&&o.contains(e)));
+      gsap.set(els,{autoAlpha:0,y:32});
+      ScrollTrigger.batch(els,{start:"top 92%",once:true,onEnter:b=>gsap.to(b,{autoAlpha:1,y:0,stagger:.09,duration:.9,overwrite:true,clearProps:"transform,opacity,visibility"})});
+      // Bars grow from their baseline
+      document.querySelectorAll(".bars, .maxd").forEach(box=>{
+        gsap.from(box.querySelectorAll(".b i, .mx-b i"),{scaleX:0,transformOrigin:"0% 50%",duration:1.1,stagger:{amount:.6},
+          scrollTrigger:{trigger:box,start:"top 80%",once:true}});
+      });
+      // 2x2: quadrants settle, then needs drop in from most to least important
+      const order=Object.values(nodes).sort((a,b)=>byId[b.dataset.id].s-byId[a.dataset.id].s);
+      gsap.timeline({scrollTrigger:{trigger:"#quad",start:"top 75%",once:true}})
+        .from("#quad svg > g:first-child > rect",{autoAlpha:0,scale:.94,transformOrigin:"50% 50%",stagger:.08,duration:.7})
+        .from(order,{autoAlpha:0,y:14,stagger:.06,duration:.6,ease:"back.out(1.8)",clearProps:"all"},"-=0.35");
+      // Mini 2x2 in each thread: context dots, then this thread's need pops with a halo
+      document.querySelectorAll(".mq").forEach(box=>{
+        gsap.timeline({scrollTrigger:{trigger:box,start:"top 85%",once:true},delay:.2})
+          .from(box.querySelectorAll(".mq-dot"),{autoAlpha:0,scale:0,transformOrigin:"50% 50%",stagger:{amount:.35,from:"random"},duration:.4})
+          .from(box.querySelectorAll(".mq-hot"),{scale:0,transformOrigin:"50% 50%",duration:.7,ease:"back.out(3)",stagger:.15},"-=0.1")
+          .from(box.querySelectorAll(".mq-halo"),{scale:0,transformOrigin:"50% 50%",duration:1.2,ease:"elastic.out(1,0.45)",stagger:.15},"<0.1")
+          .from(box.querySelectorAll(".mq-lab"),{autoAlpha:0,x:-6,duration:.5,stagger:.15},"<0.15");
+      });
+      // +23% counts up
+      const big=document.querySelector(".win .big");
+      if(big){ const txt=big.textContent, o={v:0}; counters.push([big,txt]); big.textContent="+0%";
+        gsap.to(o,{v:23,duration:1.5,ease:"power2.out",onUpdate:()=>{big.textContent="+"+Math.round(o.v)+"%"},scrollTrigger:{trigger:big,start:"top 85%",once:true}}); }
+      // Impact map: quadrant tiles cascade in when the popover opens
+      const cascade=()=>{ if(isOpen()) gsap.from("#impact-map .iq",{y:14,autoAlpha:0,stagger:.05,duration:.5,delay:.05,overwrite:true,clearProps:"all"}); };
+      fab.addEventListener("click",cascade);
+      return ()=>{ counters.forEach(([n,t])=>{n.textContent=t}); fab.removeEventListener("click",cascade); };
+    });
+    addEventListener("load",()=>ScrollTrigger.refresh());
+  }
+  document.documentElement.classList.remove("gs");
 })();
 </script>
 </html>
